@@ -1,9 +1,0 @@
-services:
-  website:
-    build:
-      context: .
-      network: host
-    container_name: shagoto-website-v2
-    restart: unless-stopped
-    ports:
-      - "8080:80"

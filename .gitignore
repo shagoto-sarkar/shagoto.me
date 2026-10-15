@@ -8,6 +8,7 @@ node_modules/
 # Environment and editor
 .env
 .env.*
+.wrangler/
 .DS_Store
 *.log
 .vscode/

@@ -18,13 +18,13 @@ const {
     </div>
 
     <div class="viewer-tabs" role="tablist" aria-label="Research View Options">
-      <button type="button" class="viewer-tab active" data-view="split" id="btn-split">
+      <button type="button" class="viewer-tab active" data-view="split" id="btn-split" aria-pressed="true">
         Side-by-Side
       </button>
-      <button type="button" class="viewer-tab" data-view="prose" id="btn-prose">
+      <button type="button" class="viewer-tab" data-view="prose" id="btn-prose" aria-pressed="false">
         Methodology
       </button>
-      <button type="button" class="viewer-tab" data-view="proof" id="btn-proof">
+      <button type="button" class="viewer-tab" data-view="proof" id="btn-proof" aria-pressed="false">
         Proofs &amp; Models
       </button>
     </div>
@@ -136,6 +136,7 @@ const {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-width: 0;
   }
 
   .viewer-prose {
@@ -165,7 +166,15 @@ const {
   .column-content {
     padding: var(--space-6);
     overflow-y: auto;
+    overflow-x: hidden;
     flex-grow: 1;
+    min-width: 0;
+  }
+
+  .viewer-column :global(pre),
+  .viewer-column :global(.astro-code) {
+    overflow-x: auto;
+    max-width: 100%;
   }
 
   @media (max-width: 860px) {
@@ -201,10 +210,13 @@ const {
       indicator.textContent = labels[mode] || mode;
 
       tabs.forEach(tab => {
-        if (tab.getAttribute('data-view') === mode) {
+        const isCurrent = tab.getAttribute('data-view') === mode;
+        if (isCurrent) {
           tab.classList.add('active');
+          tab.setAttribute('aria-pressed', 'true');
         } else {
           tab.classList.remove('active');
+          tab.setAttribute('aria-pressed', 'false');
         }
       });
     }

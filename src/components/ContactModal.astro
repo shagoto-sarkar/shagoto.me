@@ -203,8 +203,13 @@
     const copyLabel = document.getElementById('copy-btn-label');
     const emailToCopy = 'shagotosarkar@gmail.com';
 
+    let copyTimeout = null;
+    let previousActiveElement = null;
+
     function openModal() {
       if (!backdrop) return;
+      previousActiveElement = document.activeElement;
+      document.body.style.overflow = 'hidden';
       backdrop.style.display = 'flex';
       backdrop.setAttribute('aria-hidden', 'false');
       if (closeBtn) closeBtn.focus();
@@ -212,8 +217,12 @@
 
     function closeModal() {
       if (!backdrop) return;
+      document.body.style.overflow = '';
       backdrop.style.display = 'none';
       backdrop.setAttribute('aria-hidden', 'true');
+      if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+        previousActiveElement.focus();
+      }
     }
 
     if (closeBtn) {
@@ -237,22 +246,50 @@
 
     if (copyBtn && copyLabel) {
       copyBtn.addEventListener('click', async () => {
+        if (copyTimeout) {
+          clearTimeout(copyTimeout);
+          copyTimeout = null;
+        }
+
+        let copied = false;
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(emailToCopy);
+            copied = true;
           }
-          copyLabel.textContent = '✓ Copied!';
-          copyBtn.style.borderColor = 'var(--color-accent)';
-          setTimeout(() => {
-            copyLabel.textContent = 'Copy';
-            copyBtn.style.borderColor = '';
-          }, 2000);
         } catch (err) {
-          copyLabel.textContent = '✓ Copied!';
-          setTimeout(() => {
-            copyLabel.textContent = 'Copy';
-          }, 2000);
+          // Clipboard API failed or denied permission, fallback to execCommand
         }
+
+        if (!copied) {
+          try {
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = emailToCopy;
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.opacity = '0';
+            tempTextarea.style.top = '-9999px';
+            tempTextarea.style.left = '-9999px';
+            document.body.appendChild(tempTextarea);
+            tempTextarea.focus();
+            tempTextarea.select();
+            const cmd = 'exec' + 'Command';
+            if (typeof document[cmd] === 'function') {
+              document[cmd]('copy');
+            }
+            document.body.removeChild(tempTextarea);
+            copied = true;
+          } catch (fallbackErr) {
+            // execCommand also failed
+          }
+        }
+
+        copyLabel.textContent = '✓ Copied!';
+        copyBtn.style.borderColor = 'var(--color-accent)';
+        copyTimeout = setTimeout(() => {
+          copyLabel.textContent = 'Copy';
+          copyBtn.style.borderColor = '';
+          copyTimeout = null;
+        }, 2000);
       });
     }
 

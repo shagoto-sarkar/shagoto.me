@@ -4,6 +4,7 @@ import path from 'node:path';
 const distDir = path.resolve('./dist');
 
 const expectedFiles = [
+  '_headers',
   'index.html',
   '404.html',
   'CNAME',
@@ -217,6 +218,23 @@ if (notFoundHtml.includes('<meta name="robots" content="noindex, nofollow"') &&
   console.log('[PASS] 404.html contains noindex, nofollow and omits canonical tag');
 } else {
   console.error('[FAIL] 404.html lacks noindex meta tag or incorrectly includes canonical link');
+  failed = true;
+}
+
+// 5. Cloudflare _headers verification
+console.log('\n=== CLOUDFLARE EDGE CONFIGURATION CHECKS ===');
+const headersPath = path.join(distDir, '_headers');
+if (fs.existsSync(headersPath)) {
+  const headersContent = fs.readFileSync(headersPath, 'utf8');
+  if (headersContent.includes('Cache-Control: public, max-age=31536000, immutable') &&
+      headersContent.includes('X-Content-Type-Options: nosniff')) {
+    console.log('[PASS] _headers contains immutable caching and nosniff security headers');
+  } else {
+    console.error('[FAIL] _headers missing expected caching or security rules');
+    failed = true;
+  }
+} else {
+  console.error('[FAIL] _headers missing in dist output');
   failed = true;
 }
 

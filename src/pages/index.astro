@@ -8,9 +8,9 @@ const allProjects = await getCollection('projects');
 const allNotes = await getCollection('notes');
 
 // Sort entries chronologically
-const sortedResearch = [...allResearch].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-const sortedProjects = [...allProjects].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-const sortedNotes = [...allNotes].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const sortedResearch = [...allResearch].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const sortedProjects = [...allProjects].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const sortedNotes = [...allNotes].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <BaseLayout 

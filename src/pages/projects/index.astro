@@ -4,7 +4,7 @@ import ExecutionCard from '../../components/ExecutionCard.astro';
 import { getCollection } from 'astro:content';
 
 const projectEntries = (await getCollection('projects')).sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 ---
 

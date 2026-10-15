@@ -1,16 +1,21 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArchitectureDiagram from '../../components/ArchitectureDiagram.astro';
+import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import fs from 'node:fs';
 import path from 'node:path';
 
 export async function getStaticPaths() {
   const notesEntries = await getCollection('notes');
-  return notesEntries.map(entry => ({
+  return notesEntries.map((entry: CollectionEntry<'notes'>) => ({
     params: { slug: entry.slug },
     props: { entry },
   }));
+}
+
+interface Props {
+  entry: CollectionEntry<'notes'>;
 }
 
 const { entry } = Astro.props;
