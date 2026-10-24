@@ -28,7 +28,7 @@
                                           ▼ (Zero Cold-Start Edge Distribution)
                          ┌─────────────────────────────────┐
                          │ dist/ (Static Compilation)      │
-                         │ - Pre-rendered HTML (16 routes) │
+                         │ - Pre-rendered HTML (17 routes) │
                          │ - Self-hosted Fonts (*.woff2)   │
                          │ - SVG Architecture Diagrams     │
                          │ - public/_headers & robots.txt  │
@@ -96,7 +96,7 @@ All interactions use pure, accessible vanilla TypeScript/JavaScript without exte
 - **Command Palette (`src/components/CommandPalette.astro`):** Global keyboard launcher (`Cmd+K` / `Ctrl+K`) with instant client-side fuzzy search across research, projects, notes, and shortcuts.
 - **Contact Modal (`src/components/ContactModal.astro`):** Accessible dialog with direct web Gmail compose link, 1-click clipboard copy (`navigator.clipboard`), and verified social channels.
 - **Scholarly Viewer:** Dual-pane layout on research papers displaying side-by-side paper abstracts and executable Z3 SMT-LIB2 solver specifications.
-- **Architecture Diagrams:** Inline SVG diagrams rendered at build time with comprehensive `aria-label` accessibility descriptors (OpenGL simulation, Mini-Compiler, Java Ridesharing, Cash Governor, Go Edge Router, Log Cognitive Journal).
+- **Architecture Diagrams:** Inline SVG diagrams rendered at build time with comprehensive `aria-label` accessibility descriptors (OpenGL simulation, Mini-Compiler, Java Ridesharing, CashApp Governor, Go Edge Router, Log Cognitive Journal, SerialNow Queue System).
 
 ---
 

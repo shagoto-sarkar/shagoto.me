@@ -1,0 +1,110 @@
+<svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 280" role="graphics-document document" aria-label="Architecture diagram of SerialNow. outpatient queue arbitration system showing receptionist cockpit, deterministic dual-lane batch rotation, zero-PII patient transparency projection, and planned edge persistence in mineral teal theme.">
+  <title>SerialNow. Outpatient Queue Arbitration &amp; Coordination Architecture</title>
+  <defs>
+    <style>
+      .bg { fill: #081417; }
+      .box { fill: #0d2126; stroke: #1d3f47; stroke-width: 1.5; rx: 4px; }
+      .box-mint { fill: #0d2126; stroke: #2fd5a6; stroke-width: 1.5; rx: 4px; }
+      .box-teal { fill: #132c33; stroke: #265561; stroke-width: 1.5; rx: 4px; }
+      .box-amber { fill: #0d2126; stroke: #d6a976; stroke-width: 1.5; rx: 4px; }
+      .text-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; fill: #f7f6f2; text-anchor: middle; }
+      .text-sub { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: #92abb2; text-anchor: middle; }
+      .text-accent-mint { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: #2fd5a6; text-anchor: middle; }
+      .text-accent-teal { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: #48a9be; text-anchor: middle; }
+      .text-accent-amber { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: #d6a976; text-anchor: middle; }
+      .arrow { stroke: #45626a; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+      .arrow-mint { stroke: #2fd5a6; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-mint); }
+      .dot-mint { fill: #2fd5a6; }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#45626a" />
+    </marker>
+    <marker id="arrowhead-mint" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#2fd5a6" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="280" class="bg" rx="6" />
+
+  <!-- Node 1: Receptionist Cockpit -->
+  <g transform="translate(25, 35)">
+    <rect width="210" height="85" class="box-teal" />
+    <text x="105" y="24" class="text-title">Receptionist Cockpit</text>
+    <text x="105" y="42" class="text-accent-mint">Sub-Second Operational Actions</text>
+    <text x="105" y="58" class="text-sub">Complete &amp; Next, Skip, Recall</text>
+    <text x="105" y="74" class="text-sub">5s Safe Undo &amp; Tap Debounce</text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <path d="M 235 77 L 275 77" class="arrow-mint" />
+
+  <!-- Node 2: Deterministic Dual-Lane Queue Arbiter -->
+  <g transform="translate(275, 35)">
+    <rect width="215" height="85" class="box-mint" />
+    <text x="107" y="24" class="text-title">Dual-Lane Queue Arbiter</text>
+    <text x="107" y="42" class="text-accent-mint">Lane A: First Consultations</text>
+    <text x="107" y="58" class="text-sub">Lane B: Report Review / Returns</text>
+    <text x="107" y="74" class="text-accent-amber">Lane X: Interleaved Triage</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <path d="M 490 77 L 530 77" class="arrow-mint" />
+
+  <!-- Node 3: Batch Rotation State Machine -->
+  <g transform="translate(530, 35)">
+    <rect width="205" height="85" class="box" />
+    <text x="102" y="24" class="text-title">Batch Rotation Engine</text>
+    <text x="102" y="42" class="text-sub">Configurable Alternation</text>
+    <text x="102" y="58" class="text-accent-mint">Default: 5 A : 5 B Target</text>
+    <text x="102" y="74" class="text-sub">Queue Fairness Enforcement</text>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <path d="M 735 77 L 775 77" class="arrow" />
+
+  <!-- Node 4: Doctor Chamber & Physical Call -->
+  <g transform="translate(775, 35)">
+    <rect width="200" height="85" class="box-amber" />
+    <text x="100" y="24" class="text-title">Doctor Chamber</text>
+    <text x="100" y="42" class="text-accent-amber">Model B Physical Calling</text>
+    <text x="100" y="58" class="text-sub">Zero Patient Device Dependency</text>
+    <text x="100" y="74" class="text-sub">Doctor Unburdened from App</text>
+  </g>
+
+  <!-- Node 5 (Lower Left): Zero-PII Patient Transparency Projection -->
+  <g transform="translate(25, 155)">
+    <rect width="210" height="90" class="box" />
+    <text x="105" y="24" class="text-title">Patient Live View (/preview)</text>
+    <text x="105" y="42" class="text-accent-teal">Bangla-First Mobile Layout</text>
+    <text x="105" y="58" class="text-sub">Uncalled Bookings Ahead Count</text>
+    <text x="105" y="74" class="text-sub">Visible Timestamp &amp; Stale State</text>
+  </g>
+
+  <!-- Path between Node 5 and Node 2 -->
+  <path d="M 130 155 L 130 120" class="arrow" />
+
+  <!-- Node 6 (Lower Center): Zero-Leak Privacy Guard -->
+  <g transform="translate(275, 155)">
+    <rect width="215" height="90" class="box-teal" />
+    <text x="107" y="24" class="text-title">Zero-PII Projection Layer</text>
+    <text x="107" y="42" class="text-sub">Whitelist Drops All Private PII</text>
+    <text x="107" y="58" class="text-sub">No Patient Names or Phones</text>
+    <text x="107" y="74" class="text-accent-mint">Zero Fake Waiting Countdown</text>
+  </g>
+
+  <!-- Path between Node 5 and Node 6 -->
+  <path d="M 235 200 L 275 200" class="arrow" />
+
+  <!-- Node 7 (Lower Right): Planned Cloudflare Edge Persistence & Studio Identity -->
+  <g transform="translate(530, 155)">
+    <rect width="445" height="90" class="box" />
+    <text x="222" y="24" class="text-title">S.goto Lab &bull; Mineral Teal Identity &bull; Edge Engine</text>
+    <text x="222" y="42" class="text-sub">Cloudflare Workers V8 + D1 SQLite Partition &bull; React 19 + TypeScript (Strict)</text>
+    <text x="222" y="58" class="text-sub">System Noto Sans Bengali &bull; Low-Fatigue Contrast &bull; Signature Mint Dot Punctuation</text>
+    <text x="222" y="74" class="text-accent-mint">Quality Gate: 75 Vitest Unit Tests &amp; 50 Playwright Axe A11y Tests</text>
+  </g>
+
+  <!-- Path between Node 6 and Node 7 -->
+  <path d="M 490 200 L 530 200" class="arrow" />
+</svg>

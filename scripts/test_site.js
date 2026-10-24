@@ -13,7 +13,8 @@ const expectedFiles = [
   'research/abductive-neuro-symbolic-engine/index.html',
   'research/z3-cardiorenal-thesis-proposal/index.html',
   'projects/index.html',
-  'projects/cash-expense-governor/index.html',
+  'projects/cashapp-expense-governor/index.html',
+  'projects/serialnow-queue-system/index.html',
   'projects/go-edge-router/index.html',
   'projects/log-cognitive-journal/index.html',
   'projects/opengl-lower-manhattan/index.html',
@@ -118,15 +119,17 @@ const hasSvg1 = researchHtml.includes('<svg');
 const hasSvg2 = thesisHtml.includes('<svg');
 const openglHtml = fs.readFileSync(path.join(distDir, 'projects/opengl-lower-manhattan/index.html'), 'utf8');
 const hasSvg3 = openglHtml.includes('<svg');
-const cashHtml = fs.readFileSync(path.join(distDir, 'projects/cash-expense-governor/index.html'), 'utf8');
+const cashHtml = fs.readFileSync(path.join(distDir, 'projects/cashapp-expense-governor/index.html'), 'utf8');
 const hasSvg4 = cashHtml.includes('<svg');
 const goHtml = fs.readFileSync(path.join(distDir, 'projects/go-edge-router/index.html'), 'utf8');
 const hasSvg5 = goHtml.includes('<svg');
 const logHtml = fs.readFileSync(path.join(distDir, 'projects/log-cognitive-journal/index.html'), 'utf8');
 const hasSvg6 = logHtml.includes('<svg');
+const serialnowHtml = fs.readFileSync(path.join(distDir, 'projects/serialnow-queue-system/index.html'), 'utf8');
+const hasSvg7 = serialnowHtml.includes('<svg');
 
 console.log('\n=== SVG DIAGRAM CHECKS ===');
-if (hasSvg1 && hasSvg2 && hasSvg3 && hasSvg4 && hasSvg5 && hasSvg6) {
+if (hasSvg1 && hasSvg2 && hasSvg3 && hasSvg4 && hasSvg5 && hasSvg6 && hasSvg7) {
   console.log('[PASS] All architecture diagrams rendered as SVG with aria-label');
 } else {
   console.error('[FAIL] Architecture diagram SVGs missing in pages');

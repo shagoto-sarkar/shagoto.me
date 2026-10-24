@@ -55,7 +55,7 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
 
 ### 2.4 Content Collections & Zod Invariants
 - **Schema Validation:** Every `.md` file in [`src/content/`](src/content/) must strictly satisfy the Zod schemas in [`src/content/config.ts`](src/content/config.ts).
-- **Slug Format:** Slugs must be strict lowercase kebab-case (e.g., `cash-expense-governor.md`).
+- **Slug Format:** Slugs must be strict lowercase kebab-case (e.g., `cashapp-expense-governor.md`, `serialnow-queue-system.md`).
 - **Diagram IDs:** If a project or research entry includes a diagram, register its mapping in `diagramMap` inside [`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) or [`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro).
 
 ---
