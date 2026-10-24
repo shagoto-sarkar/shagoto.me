@@ -1,44 +1,89 @@
 # shagoto.me
 
-Personal academic & systems engineering publication of Shagoto Sarkar.
+Personal academic and systems engineering publication of Shagoto Sarkar.
 
-## Architecture
+- **Production URL:** [https://shagoto.me](https://shagoto.me)
+- **Pages Origin:** [https://shagoto-me.pages.dev](https://shagoto-me.pages.dev)
+- **Architecture Guide:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+- **AI Agent Routing:** [`AGENTS.md`](AGENTS.md)
 
-- **Core Framework:** [Astro 5](https://astro.build/) (`output: 'static'`)
-- **Language:** TypeScript (Strict mode)
-- **Styling:** Vanilla CSS (`AXIOM Design System v2`), zero client-side UI frameworks
-- **Diagrams & Highlighting:** Build-time Shiki syntax highlighting & SVG architecture diagrams
-- **Deployment & Edge Platform:** Cloudflare Pages / Static Edge (`wrangler.jsonc`, `public/_headers`)
+---
 
-## Local Development
+## Tech Stack & Architecture
 
-Ensure Node.js 22 is installed.
+| Layer | Technologies | Role |
+| :--- | :--- | :--- |
+| **Static Generator** | Astro 5.4+ (`output: 'static'`), TypeScript (strict) | Zero client UI runtime, 100% pre-rendered HTML/CSS |
+| **Design System** | Vanilla CSS (`AXIOM Design System v2`) | Refined Technical Editorialism, semantic CSS custom properties |
+| **Typography** | Self-hosted *EB Garamond* & *JetBrains Mono* | 52 `.woff2` font files served locally with immutable caching |
+| **Diagrams & Syntax**| Inline accessible SVGs + Build-time Shiki | Zero client runtime overhead, full screen reader support |
+| **Edge Hosting** | Cloudflare Pages + Anycast CDN | Instant global distribution, automated TLS, immutable headers |
+| **Content Layer** | Astro Content Collections + Zod validation | Type-safe markdown collections for research, projects & notes |
+
+---
+
+## Directory & Entry-Point Tree
+
+```
+shagoto.me/
+├── src/
+│   ├── assets/
+│   │   └── diagrams/          # Architecture SVGs (Cash, Go, Log, OpenGL, etc.)
+│   ├── components/
+│   │   ├── CommandPalette.astro # Fuzzy search launcher (Cmd+K / Ctrl+K)
+│   │   ├── ContactModal.astro # Accessible contact dialog & clipboard copy
+│   │   ├── Footer.astro       # Editorial footer & verified social channels
+│   │   └── Header.astro       # Top navigation, status indicator & search button
+│   ├── content/               # Type-safe Astro Markdown content collections
+│   │   ├── notes/             # Technical essays & systems notes
+│   │   ├── projects/          # Systems engineering & open-source case studies
+│   │   ├── research/          # Neuro-symbolic reasoning & formal verification papers
+│   │   └── config.ts          # Zod schema definitions for all content collections
+│   ├── layouts/
+│   │   └── BaseLayout.astro   # Root HTML shell, SEO metadata, canonical links & fonts
+│   ├── pages/
+│   │   ├── notes/             # Notes index and [...slug].astro dynamic routes
+│   │   ├── projects/          # Projects index and [...slug].astro dynamic routes
+│   │   ├── research/          # Research index and [...slug].astro dynamic routes
+│   │   ├── 404.astro          # Custom 404 error page (noindex, nofollow)
+│   │   └── index.astro        # Editorial homepage
+│   └── styles/
+│       └── global.css         # AXIOM v2 CSS custom properties & typography tokens
+├── public/                    # Static public assets (_headers, robots.txt, fonts, cv.pdf)
+├── scripts/
+│   └── test_site.js           # Production verification test suite (HTML & DOM audit)
+├── ARCHITECTURE.md            # Deep system architecture & editorial guidelines
+├── AGENTS.md                  # AI coding agent routing rules & invariants
+├── astro.config.mjs           # Astro configuration with sitemap integration
+├── wrangler.jsonc             # Cloudflare Pages deployment configuration
+└── package.json               # Scripts & dependencies
+```
+
+---
+
+## Operational CLI Commands
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Start local development server
+# 2. Start local Astro development server (Port 4321)
 npm run dev
 
-# Run diagnostics and type checking
+# 3. Run Astro schema & TypeScript diagnostics
 npm run check
 
-# Execute production build and verification test suite
+# 4. Full production test suite (build + check + scripts/test_site.js)
 npm test
+
+# 5. Build static production distribution (dist/)
+npm run build
+
+# 6. Preview local production build (Port 4321)
+npm run preview
+
+# 7. Deploy directly to Cloudflare Pages from terminal
+npm run deploy
 ```
 
-## Cloudflare Pages Deployment Configuration
-
-When deploying through the Cloudflare Dashboard or Git integration, configure:
-
-- **Framework preset:** None (or Astro)
-- **Build command:** `npm run build`
-- **Build output directory:** `dist`
-- **Node.js version:** `22` (automatically detected via `.node-version`)
-
-Alternatively, deploy directly via Wrangler CLI:
-
-```bash
-npx wrangler pages deploy dist
-```
+For complete technical architecture, design tokens, and editorial invariants, see [`ARCHITECTURE.md`](ARCHITECTURE.md). For AI coding guidelines and DOM hook requirements, see [`AGENTS.md`](AGENTS.md).

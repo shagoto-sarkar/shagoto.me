@@ -1,0 +1,88 @@
+# AI Agent Routing Guide & System Prompt (`AGENTS.md`)
+
+> **Instructions for AI Coding Assistants:**  
+> Read this guide before inspecting or modifying code. It defines exact file-routing rules, strict architectural invariants, codebase conventions, and do-not-touch zones for `shagoto.me`.
+
+---
+
+## 1. Context Routing Map
+
+When assigned a task in a specific domain, read and edit **ONLY** the designated files. Do not scan unrelated directories or ingest whole folders.
+
+| Domain / Task | Read & Modify First | Supporting Logic | Files to Ignore |
+| :--- | :--- | :--- | :--- |
+| **Research Publications & Theses** | [`src/content/research/*.md`](src/content/research/)<br>[`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/research/index.astro`](src/pages/research/index.astro) | `src/content/notes/*`<br>`public/fonts/*` |
+| **Project Portfolios & Architecture** | [`src/content/projects/*.md`](src/content/projects/)<br>[`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/projects/index.astro`](src/pages/projects/index.astro) | `src/content/notes/*`<br>`public/fonts/*` |
+| **Technical Notes & Essays** | [`src/content/notes/*.md`](src/content/notes/)<br>[`src/pages/notes/[...slug].astro`](src/pages/notes/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/notes/index.astro`](src/pages/notes/index.astro) | `src/content/research/*`<br>`public/fonts/*` |
+| **Homepage & Editorial Layout** | [`src/pages/index.astro`](src/pages/index.astro)<br>[`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | [`src/styles/global.css`](src/styles/global.css)<br>[`src/components/Header.astro`](src/components/Header.astro) | `scripts/*`<br>`src/content/*` |
+| **Design System & Global Styling** | [`src/styles/global.css`](src/styles/global.css)<br>[`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | Scoped `<style>` blocks in `src/pages/*` | `scripts/*`<br>`public/*` |
+| **Interactive Components (Palette, Modal)**| [`src/components/CommandPalette.astro`](src/components/CommandPalette.astro)<br>[`src/components/ContactModal.astro`](src/components/ContactModal.astro) | [`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | `src/content/*`<br>`public/fonts/*` |
+| **Architecture Diagrams & SVGs** | [`src/assets/diagrams/*.svg`](src/assets/diagrams/)<br>[`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) | [`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro) | `src/components/*`<br>`public/fonts/*` |
+| **SEO, Headers & Edge Config** | [`astro.config.mjs`](astro.config.mjs)<br>[`public/_headers`](public/_headers)<br>[`public/robots.txt`](public/robots.txt)<br>[`wrangler.jsonc`](wrangler.jsonc) | [`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | `src/content/*`<br>`src/components/*` |
+| **Verification Test Suite** | [`scripts/test_site.js`](scripts/test_site.js) | `package.json` | `public/fonts/*`<br>`src/assets/*` |
+
+---
+
+## 2. Invariant Codebase Conventions
+
+### 2.1 Zero Client UI Frameworks
+- **No React, Vue, Svelte, Solid, or Tailwind:** All components must be written as native Astro templates (`.astro`) with scoped `<style>` blocks or styles in [`src/styles/global.css`](src/styles/global.css).
+- **Vanilla DOM Interactivity:** Any dynamic behavior (such as the Command Palette or Contact Modal) must be authored in lightweight vanilla TypeScript/JavaScript within `<script>` tags.
+
+### 2.2 Refined Technical Editorialism
+- **Prohibited Gimmicks:** Never introduce blinking cursors (`terminal-cursor`), matrix rain, fake terminal status lines (`cat /proc/self/status`), or simulated typewriter effects.
+- **Tone & Typography:** Formal, intellectual, calm, restrained. Use *EB Garamond* for editorial reading prose and *JetBrains Mono* for code/metadata.
+
+### 2.3 Test-Critical DOM Hooks & Exact Strings
+[`scripts/test_site.js`](scripts/test_site.js) inspects the compiled `./dist` directory. Modifying or removing any of the following strings or attributes will break CI tests:
+- **Homepage Titles & Headings:**
+  - `Architecting verifiable intelligence`
+  - `Daffodil International University`
+  - `Active Areas of Investigation`
+  - `Selected Research`
+  - `Selected Systems & Projects`
+  - `Recent Notes & Essays`
+- **DOM IDs & Classes:**
+  - `#cmd-palette-backdrop`, `#contact-modal-backdrop`, `#copy-email-btn`, `#footer-contact-link`
+  - `scholarly-viewer`, `openContactModal()`
+- **Verified URLs & Contacts:**
+  - `mail.google.com/mail/?view=cm` and `shagotosarkar@gmail.com`
+  - `https://wa.me/8801771425996` (`wp: message`)
+  - `https://www.instagram.com/shagotosarkar/` (`ig: @shagotosarkar`)
+  - `https://www.facebook.com/shagoto.sarkar666` (`fb: /shagoto`)
+  - `https://linkedin.com/in/shagoto-sarkar`
+- **SVG Diagrams:** Must be rendered inline as `<svg ... aria-label="...">`.
+
+### 2.4 Content Collections & Zod Invariants
+- **Schema Validation:** Every `.md` file in [`src/content/`](src/content/) must strictly satisfy the Zod schemas in [`src/content/config.ts`](src/content/config.ts).
+- **Slug Format:** Slugs must be strict lowercase kebab-case (e.g., `cash-expense-governor.md`).
+- **Diagram IDs:** If a project or research entry includes a diagram, register its mapping in `diagramMap` inside [`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) or [`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro).
+
+---
+
+## 3. Do-Not-Touch Zones
+
+Never inspect, parse, or edit files in these paths:
+- `dist/`: Static build output generated by Astro.
+- `node_modules/`: Package dependencies.
+- `.astro/`: Astro build cache and auto-generated TypeScript declarations.
+- `.wrangler/`: Local Miniflare state and local session cache.
+- `package-lock.json`: Dependency lockfile.
+- `.git/`: Version control metadata.
+- `scripts/mermaid.min.js`: Pre-compiled Mermaid vendor bundle.
+- `public/fonts/`: 52 binary `.woff2` font files.
+- `public/cv.pdf`: Binary resume PDF.
+
+---
+
+## 4. Pre-Commit Verification Checklist
+
+Before completing any task or committing changes, run this exact sequence of commands in the project root:
+
+```bash
+# 1. Astro typecheck & schema diagnostics (Must pass with 0 errors)
+npm run check
+
+# 2. Complete production verification test suite (Build + Diagnostics + test_site.js)
+npm test
+```
