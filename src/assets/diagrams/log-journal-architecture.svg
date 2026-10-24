@@ -1,0 +1,83 @@
+<svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 240" role="graphics-document document" aria-label="Architecture diagram of log.shagoto.me showing two-tier hybrid envelope encryption, Ghost Drop write-only mode, and volatile RAM decryption.">
+  <title>log.shagoto.me Two-Tier Hybrid Envelope Encryption Architecture</title>
+  <defs>
+    <style>
+      .bg { fill: #0b0f19; }
+      .box { fill: #111827; stroke: #374151; stroke-width: 1.5; rx: 4px; }
+      .box-purple { fill: #111827; stroke: #a855f7; stroke-width: 1.5; rx: 4px; }
+      .box-green { fill: #111827; stroke: #10b981; stroke-width: 1.5; rx: 4px; }
+      .box-red { fill: #111827; stroke: #f43f5e; stroke-width: 1.5; rx: 4px; }
+      .text-title { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; fill: #f9fafb; text-anchor: middle; }
+      .text-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #9ca3af; text-anchor: middle; }
+      .text-purple { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #c084fc; text-anchor: middle; }
+      .text-green { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #34d399; text-anchor: middle; }
+      .text-red { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #fb7185; text-anchor: middle; }
+      .arrow { stroke: #6b7280; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-log); }
+      .arrow-purple { stroke: #a855f7; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-purple); }
+      .arrow-green { stroke: #10b981; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-green-log); }
+    </style>
+    <marker id="arrowhead-log" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#6b7280" />
+    </marker>
+    <marker id="arrowhead-purple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#a855f7" />
+    </marker>
+    <marker id="arrowhead-green-log" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="240" class="bg" rx="6" />
+
+  <!-- Tier 1: Ghost Drop Mode (Write-Only) -->
+  <g transform="translate(30, 25)">
+    <rect width="260" height="90" class="box-green" />
+    <text x="130" y="26" class="text-title">Tier 1: Ghost Drop Mode</text>
+    <text x="130" y="44" class="text-sub">Public Terminal &bull; Quick PIN</text>
+    <text x="130" y="60" class="text-green">PBKDF2 (200k) &bull; RSA Public Key Only</text>
+    <text x="130" y="76" class="text-sub">Ephemeral AES-GCM-256 + 12-byte IV</text>
+  </g>
+
+  <!-- Arrow Tier 1 -> Envelope -->
+  <path d="M 290 70 L 370 70" class="arrow-green" />
+
+  <!-- Envelope Packing -->
+  <g transform="translate(370, 25)">
+    <rect width="250" height="90" class="box-purple" />
+    <text x="125" y="26" class="text-title">Hybrid Envelope Encryption</text>
+    <text x="125" y="44" class="text-sub">Ciphertext = Encrypt(Thought, AES)</text>
+    <text x="125" y="60" class="text-purple">WrappedKey = Encrypt(AES, RSA_Pub)</text>
+    <text x="125" y="76" class="text-green">Zero-Persistence: Volatile RAM Only</text>
+  </g>
+
+  <!-- Arrow Envelope -> D1 -->
+  <path d="M 620 70 L 700 70" class="arrow-purple" />
+
+  <!-- Cloudflare D1 Store -->
+  <g transform="translate(700, 25)">
+    <rect width="270" height="90" class="box" />
+    <text x="135" y="26" class="text-title">Cloudflare D1 (Zero-Trust)</text>
+    <text x="135" y="44" class="text-sub">Stores: Ciphertext + IV + WrappedKey</text>
+    <text x="135" y="60" class="text-sub">Asia/Dhaka (UTC+6) Timestamps</text>
+    <text x="135" y="76" class="text-red">Indecipherable without Private Key</text>
+  </g>
+
+  <!-- Tier 2: Studio Bridge (Trusted Machine) -->
+  <g transform="translate(30, 135)">
+    <rect width="450" height="80" class="box-purple" />
+    <text x="225" y="26" class="text-title">Tier 2: Studio Bridge (Trusted Hardware Only)</text>
+    <text x="225" y="44" class="text-sub">Master Passphrase &bull; PBKDF2 (600k Iterations) &bull; Unique User Salt</text>
+    <text x="225" y="62" class="text-purple">Decrypted RSA Private Key held strictly in volatile React useRef memory</text>
+  </g>
+
+  <!-- Arrow Tier 2 to Read Flow -->
+  <path d="M 480 175 L 560 175" class="arrow-purple" />
+
+  <g transform="translate(560, 135)">
+    <rect width="410" height="80" class="box" />
+    <text x="205" y="26" class="text-title">In-Memory Parallel Decryption</text>
+    <text x="205" y="44" class="text-sub">Unwrap AES Keys &rarr; Decrypt Timeline &amp; Action Checklist</text>
+    <text x="205" y="62" class="text-green">Immediate zero-fill memory wipe on Lock (🔒) or tab unload</text>
+  </g>
+</svg>

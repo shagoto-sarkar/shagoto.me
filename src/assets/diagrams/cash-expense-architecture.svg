@@ -1,0 +1,85 @@
+<svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 240" role="graphics-document document" aria-label="Architecture diagram of cash.shagoto.me showing dual-interface mobile keypad, pre-spend mathematical engine, Cloudflare Pages functions, and Cloudflare D1 database.">
+  <title>cash.shagoto.me Dual-Interface &amp; Edge SQLite Architecture</title>
+  <defs>
+    <style>
+      .bg { fill: #0b0f19; }
+      .box { fill: #111827; stroke: #374151; stroke-width: 1.5; rx: 4px; }
+      .box-accent { fill: #111827; stroke: #10b981; stroke-width: 1.5; rx: 4px; }
+      .box-edge { fill: #111827; stroke: #f59e0b; stroke-width: 1.5; rx: 4px; }
+      .text-title { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; fill: #f9fafb; text-anchor: middle; }
+      .text-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #9ca3af; text-anchor: middle; }
+      .text-accent { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #10b981; text-anchor: middle; }
+      .arrow { stroke: #6b7280; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+      .arrow-accent { stroke: #10b981; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-accent); }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#6b7280" />
+    </marker>
+    <marker id="arrowhead-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="240" class="bg" rx="6" />
+
+  <!-- Node 1: Mobile UI Layer -->
+  <g transform="translate(30, 40)">
+    <rect width="200" height="70" class="box" />
+    <text x="100" y="30" class="text-title">Mobile Lock-Screen UI</text>
+    <text x="100" y="48" class="text-sub">100dvh Zero-Scroll Keypad</text>
+    <text x="100" y="60" class="text-accent">2-Tap Commits (&lt;3s)</text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <path d="M 230 75 L 280 75" class="arrow" />
+
+  <!-- Node 2: Real-time Pre-Spend Engine -->
+  <g transform="translate(280, 40)">
+    <rect width="210" height="70" class="box-accent" />
+    <text x="105" y="30" class="text-title">Pre-Spend Damage Engine</text>
+    <text x="105" y="48" class="text-sub">Mathematical Allowance Check</text>
+    <text x="105" y="60" class="text-accent">Real-Time Delta Calculation</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <path d="M 490 75 L 540 75" class="arrow-accent" />
+
+  <!-- Node 3: Cloudflare Pages Edge Functions -->
+  <g transform="translate(540, 40)">
+    <rect width="200" height="70" class="box-edge" />
+    <text x="100" y="30" class="text-title">Pages Edge Functions</text>
+    <text x="100" y="48" class="text-sub">HMAC-SHA256 Auth Cookies</text>
+    <text x="100" y="60" class="text-sub">/functions/api/* Runtime</text>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <path d="M 740 75 L 790 75" class="arrow" />
+
+  <!-- Node 4: Cloudflare D1 SQLite -->
+  <g transform="translate(790, 40)">
+    <rect width="180" height="70" class="box" />
+    <text x="90" y="30" class="text-title">Cloudflare D1 (SQLite)</text>
+    <text x="90" y="48" class="text-sub">Serverless Relational Engine</text>
+    <text x="90" y="60" class="text-accent">Strict Foreign Keys &amp; Index</text>
+  </g>
+
+  <!-- Parallel Branch 1: Impulse Cooler -->
+  <g transform="translate(280, 145)">
+    <rect width="210" height="60" class="box" />
+    <text x="105" y="26" class="text-title">48h Impulse Cooler Vault</text>
+    <text x="105" y="44" class="text-sub">Parked Items &amp; Behavioral Intent</text>
+  </g>
+
+  <!-- Parallel Branch 2: Studio Bridge -->
+  <g transform="translate(540, 145)">
+    <rect width="430" height="60" class="box" />
+    <text x="215" y="26" class="text-title">Studio Bridge (/studio)</text>
+    <text x="215" y="44" class="text-sub">Active IOU &amp; Debt Ledger &bull; Budget Allocations &bull; CSV / JSON / MD Exports</text>
+  </g>
+
+  <!-- Connecting Lines -->
+  <path d="M 130 110 L 130 175 L 280 175" class="arrow" />
+  <path d="M 490 175 L 540 175" class="arrow" />
+  <path d="M 640 110 L 640 145" class="arrow" />
+</svg>

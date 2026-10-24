@@ -1,0 +1,91 @@
+<svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 240" role="graphics-document document" aria-label="Architecture diagram of go.shagoto.me showing Cloudflare Workers edge router, Hono routing engine, Workers KV cache, D1 analytics, and non-blocking telemetry.">
+  <title>go.shagoto.me Edge Routing &amp; Non-Blocking Telemetry Architecture</title>
+  <defs>
+    <style>
+      .bg { fill: #0b0f19; }
+      .box { fill: #111827; stroke: #374151; stroke-width: 1.5; rx: 4px; }
+      .box-accent { fill: #111827; stroke: #3b82f6; stroke-width: 1.5; rx: 4px; }
+      .box-orange { fill: #111827; stroke: #f97316; stroke-width: 1.5; rx: 4px; }
+      .box-green { fill: #111827; stroke: #10b981; stroke-width: 1.5; rx: 4px; }
+      .text-title { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; fill: #f9fafb; text-anchor: middle; }
+      .text-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #9ca3af; text-anchor: middle; }
+      .text-accent { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #60a5fa; text-anchor: middle; }
+      .text-green { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #34d399; text-anchor: middle; }
+      .arrow { stroke: #6b7280; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-go); }
+      .arrow-blue { stroke: #3b82f6; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-blue); }
+      .arrow-green { stroke: #10b981; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-green); }
+    </style>
+    <marker id="arrowhead-go" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#6b7280" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#3b82f6" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="240" class="bg" rx="6" />
+
+  <!-- Node 1: Inbound Request -->
+  <g transform="translate(30, 40)">
+    <rect width="190" height="70" class="box" />
+    <text x="95" y="30" class="text-title">Inbound HTTP Request</text>
+    <text x="95" y="48" class="text-sub">GET https://go.shagoto.me/:slug</text>
+    <text x="95" y="60" class="text-accent">Browser &bull; Curl &bull; QR Code</text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <path d="M 220 75 L 270 75" class="arrow" />
+
+  <!-- Node 2: Hono Router on Worker -->
+  <g transform="translate(270, 40)">
+    <rect width="220" height="70" class="box-accent" />
+    <text x="110" y="30" class="text-title">Cloudflare Worker (Hono)</text>
+    <text x="110" y="48" class="text-sub">V8 Isolate at 300+ Edge PoPs</text>
+    <text x="110" y="60" class="text-accent">~14KB Zero-Cold-Start Core</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 (Hot Path) -->
+  <path d="M 490 60 L 550 60" class="arrow-blue" />
+  <!-- Arrow 2 -> 4 (Bang Engine) -->
+  <path d="M 490 90 L 550 90" class="arrow-blue" />
+
+  <!-- Node 3: Workers KV Hot Cache -->
+  <g transform="translate(550, 25)">
+    <rect width="210" height="50" class="box-green" />
+    <text x="105" y="24" class="text-title">Workers KV Hot Cache</text>
+    <text x="105" y="38" class="text-green">&lt;10ms Edge Read /link/:slug</text>
+  </g>
+
+  <!-- Node 4: Bang Pattern Engine -->
+  <g transform="translate(550, 85)">
+    <rect width="210" height="50" class="box-orange" />
+    <text x="105" y="24" class="text-title">Dynamic Bang Rules</text>
+    <text x="105" y="38" class="text-sub">/gh/*, /arxiv/*, /doi/* (0ms DB)</text>
+  </g>
+
+  <!-- Arrow 3 & 4 -> Fast Redirect -->
+  <path d="M 760 50 L 810 75" class="arrow-green" />
+  <path d="M 760 110 L 810 75" class="arrow" />
+
+  <!-- Node 5: Destination -->
+  <g transform="translate(810, 40)">
+    <rect width="160" height="70" class="box" />
+    <text x="80" y="30" class="text-title">Target Destination</text>
+    <text x="80" y="48" class="text-green">HTTP 302 Redirect</text>
+    <text x="80" y="60" class="text-sub">&le;15ms Total P99</text>
+  </g>
+
+  <!-- Bottom Track: Non-Blocking Telemetry -->
+  <path d="M 380 110 L 380 165 L 550 165" class="arrow-blue" />
+
+  <g transform="translate(550, 145)">
+    <rect width="420" height="65" class="box" />
+    <text x="210" y="26" class="text-title">ctx.waitUntil() Telemetry Worker</text>
+    <text x="210" y="44" class="text-sub">Non-blocking background thread &bull; D1 Analytics Logging</text>
+    <text x="210" y="56" class="text-green">0ms added to user redirect response</text>
+  </g>
+</svg>

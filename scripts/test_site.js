@@ -13,6 +13,9 @@ const expectedFiles = [
   'research/abductive-neuro-symbolic-engine/index.html',
   'research/z3-cardiorenal-thesis-proposal/index.html',
   'projects/index.html',
+  'projects/cash-expense-governor/index.html',
+  'projects/go-edge-router/index.html',
+  'projects/log-cognitive-journal/index.html',
   'projects/opengl-lower-manhattan/index.html',
   'projects/js-mini-compiler-ide/index.html',
   'projects/java-ridesharing-gui/index.html',
@@ -115,10 +118,16 @@ const hasSvg1 = researchHtml.includes('<svg');
 const hasSvg2 = thesisHtml.includes('<svg');
 const openglHtml = fs.readFileSync(path.join(distDir, 'projects/opengl-lower-manhattan/index.html'), 'utf8');
 const hasSvg3 = openglHtml.includes('<svg');
+const cashHtml = fs.readFileSync(path.join(distDir, 'projects/cash-expense-governor/index.html'), 'utf8');
+const hasSvg4 = cashHtml.includes('<svg');
+const goHtml = fs.readFileSync(path.join(distDir, 'projects/go-edge-router/index.html'), 'utf8');
+const hasSvg5 = goHtml.includes('<svg');
+const logHtml = fs.readFileSync(path.join(distDir, 'projects/log-cognitive-journal/index.html'), 'utf8');
+const hasSvg6 = logHtml.includes('<svg');
 
 console.log('\n=== SVG DIAGRAM CHECKS ===');
-if (hasSvg1 && hasSvg2 && hasSvg3) {
-  console.log('[PASS] All architecture diagrams generated via Mermaid.js rendered as SVG with aria-label');
+if (hasSvg1 && hasSvg2 && hasSvg3 && hasSvg4 && hasSvg5 && hasSvg6) {
+  console.log('[PASS] All architecture diagrams rendered as SVG with aria-label');
 } else {
   console.error('[FAIL] Architecture diagram SVGs missing in pages');
   failed = true;
