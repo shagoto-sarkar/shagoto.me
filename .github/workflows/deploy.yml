@@ -83,11 +83,7 @@ jobs:
             fi
           fi
 
-          ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-9a255e86112e4815f8534fa827dbd51b}"
-          if [ "$ACCOUNT_ID" = "1e8d24858eeea95aeceb71b98246481d" ]; then
-            echo "Stale account ID detected; updating to active account ID 9a255e86112e4815f8534fa827dbd51b."
-            ACCOUNT_ID="9a255e86112e4815f8534fa827dbd51b"
-          fi
+          ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-1e8d24858eeea95aeceb71b98246481d}"
           export CLOUDFLARE_ACCOUNT_ID="$ACCOUNT_ID"
 
           echo "Deploying to Cloudflare Pages project 'shagoto-me'..."
