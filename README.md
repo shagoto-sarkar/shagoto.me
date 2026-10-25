@@ -139,13 +139,14 @@ a CI credential. Pages token permissions cover the selected account; they are
 not restricted to one Pages project. No DNS or zone write permission is needed.
 See [Cloudflare's CI upload guide](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/).
 
-Before enabling deployment, inspect the existing Pages project's Git integration.
-For a Direct Upload project, retain its current setup. For a Git-connected
-project, disable automatic production deployments and set preview branch
-selection to none before enabling Actions deployment. Preserve its repository
-connection, domains, and DNS. The read-only CI preflight rejects native builds
-that could duplicate Actions and rejects a similarly named project in another
-account. See [Pages Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/).
+Before deployment, CI verifies the existing project identity and Git integration.
+For a Direct Upload project, it retains the current setup. For a Git-connected
+project linked to this exact repository, it disables automatic production and
+preview Git builds through a narrowly scoped API patch, then reads the settings
+back to verify them. This preserves the repository connection, domains, and DNS.
+It rejects unexpected source repositories and similarly named projects in other
+accounts. The standalone `preflight` command remains read-only; `configure`
+reconciles the native Git build settings. See [Pages Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/).
 
 After deployment, `scripts/cloudflare_ci.mjs verify` checks the Cloudflare API
 for a successful production deployment matching the workflow commit. It retries

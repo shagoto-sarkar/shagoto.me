@@ -1,4 +1,5 @@
-// Read-only deployment safeguards. Never print credentials or raw API responses.
+// Deployment safeguards and narrowly scoped Git-build configuration.
+// Never print credentials or raw API responses.
 import { appendFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 
@@ -8,9 +9,11 @@ const account = process.env.CLOUDFLARE_ACCOUNT_ID;
 const sha = process.env.GITHUB_SHA;
 const mode = process.argv[2];
 
-async function api(path) {
+async function api(path, body) {
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/pages/projects/${project}${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: body ? 'PATCH' : 'GET',
+    headers: { Authorization: `Bearer ${token}`, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    ...(body ? { body: JSON.stringify(body) } : {}),
     signal: AbortSignal.timeout(30_000),
   });
   const data = await response.json();
@@ -20,7 +23,7 @@ async function api(path) {
   return data.result;
 }
 
-async function preflight() {
+async function preflight(configure = false) {
   const config = await api('');
   if (config.name !== project || config.production_branch !== 'main') {
     throw new Error('Expected existing Pages project shagoto-me with production branch main. Review its settings before deploying.');
@@ -30,6 +33,17 @@ async function preflight() {
   }
   if (config.source) {
     const source = config.source.config;
+    if (configure && source && (source.production_deployments_enabled !== false || source.preview_deployment_setting !== 'none')) {
+      if (config.source.type !== 'github' || source.owner !== 'shagoto-sarkar' || source.repo_name !== 'shagoto.me') {
+        throw new Error('Refusing to change Git builds for an unexpected source repository.');
+      }
+      await api('', { source: { type: 'github', config: {
+        production_deployments_enabled: false,
+        preview_deployment_setting: 'none',
+      } } });
+      console.log('Disabled duplicate native Git builds for the verified production Pages project.');
+      return preflight();
+    }
     if (!source || source.production_deployments_enabled !== false || source.preview_deployment_setting !== 'none') {
       throw new Error('Native Pages Git builds may be enabled. Disable automatic production and preview builds for shagoto-me before using Actions; preserve the project and custom domains.');
     }
@@ -85,8 +99,9 @@ try {
   if (!token) throw new Error('Missing GitHub Actions secret CLOUDFLARE_API_TOKEN.');
   if (!/^[a-f0-9]{32}$/.test(account ?? '')) throw new Error('Set CLOUDFLARE_ACCOUNT_ID as an Actions variable (or existing secret) to the verified project account ID.');
   if (mode === 'preflight') await preflight();
+  else if (mode === 'configure') await preflight(true);
   else if (mode === 'verify') await verify();
-  else throw new Error('Usage: node scripts/cloudflare_ci.mjs preflight|verify');
+  else throw new Error('Usage: node scripts/cloudflare_ci.mjs preflight|configure|verify');
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;
