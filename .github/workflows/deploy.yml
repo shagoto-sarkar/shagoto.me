@@ -1,85 +1,88 @@
 name: Deploy shagoto.me to Cloudflare Pages
 
 on:
+  pull_request:
+    branches: [main]
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: "cloudflare-pages"
+  group: cloudflare-pages-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   verify:
     name: Verify & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 22
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
-          cache: 'npm'
-
-      - name: Install Dependencies
+          cache: npm
+      - name: Install locked dependencies
         run: npm ci
-
-      - name: Run Diagnostics & Automated Assertion Suite
+      - name: Astro type and schema diagnostics
+        run: npm run check
+      - name: Production build and assertion suite
         run: npm test
-
-      - name: Upload Build Artifacts
-        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-        uses: actions/upload-artifact@v4
+      - name: Upload verified production build
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: dist-artifacts
+          name: dist-${{ github.sha }}
           path: dist/
+          if-no-files-found: error
           retention-days: 1
 
   deploy:
     name: Deploy to Cloudflare Pages (Production)
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: verify
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: cloudflare-pages-production
+      cancel-in-progress: false
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 22
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
-
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
+          cache: npm
+      - name: Install locked deployment tooling
+        run: npm ci --ignore-scripts
+      - name: Download verified production build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: dist-artifacts
+          name: dist-${{ github.sha }}
           path: dist/
-
-      - name: Deploy to Cloudflare Pages
+      - name: Validate credentials and single deployment pipeline
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "Verifying build artifacts in dist/..."
-          if [ ! -f "dist/index.html" ]; then
-            echo "::error title=Missing Artifacts::dist/index.html not found!"
-            exit 1
-          fi
-          echo "Artifacts verified (index.html present, $(find dist -type f | wc -l) files ready for deployment)."
-
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error title=Missing Cloudflare Secret::CLOUDFLARE_API_TOKEN is not configured in GitHub repository secrets! Please add it under https://github.com/shagoto-sarkar/shagoto.me/settings/secrets/actions/new to enable production edge releases."
-            exit 1
-          fi
-
-          ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-1e8d24858eeea95aeceb71b98246481d}"
-          export CLOUDFLARE_ACCOUNT_ID="$ACCOUNT_ID"
-
-          echo "Deploying to Cloudflare Pages project 'shagoto-me'..."
-          npx wrangler pages deploy dist --project-name=shagoto-me --branch=main --commit-dirty=true
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/cloudflare_ci.mjs preflight
+      - name: Deploy verified build
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: npx --no-install wrangler pages deploy dist --project-name=shagoto-me --branch=main --commit-hash="$GITHUB_SHA" --commit-dirty=false
+      - name: Verify deployed commit and live site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/cloudflare_ci.mjs verify

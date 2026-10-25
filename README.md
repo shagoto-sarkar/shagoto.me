@@ -107,3 +107,67 @@ npm run deploy
 ```
 
 For complete technical specifications, see [`ARCHITECTURE.md`](ARCHITECTURE.md). For AI coding rules, see [`AGENTS.md`](AGENTS.md).
+## Production CI/CD
+
+`.github/workflows/deploy.yml` is the single intended deployment pipeline. It
+preserves the existing Cloudflare Pages project and its custom domains. GitHub
+Actions with Wrangler fits this repository because it gates deployment on Astro
+diagnostics and the existing production assertion suite, then deploys that exact
+build. Do not enable a second Cloudflare Git build pipeline.
+
+Pull requests targeting `main` run `npm ci`, `npm run check`, and `npm test`
+(build, diagnostics, and site assertions). There is no separate lint tool in this
+project; Astro diagnostics provide the existing static checks. Successful pushes
+to `main` deploy automatically; manual dispatch deploys only when `main` is
+selected. PR jobs have no Cloudflare credentials. Actions are pinned to commit
+SHAs, checkout does not persist credentials, jobs have timeouts, and the GitHub
+token has only `contents: read`. The deployment job installs Wrangler from the
+existing lockfile rather than downloading an unpinned CLI. Production jobs are
+serialized and an active deployment is never cancelled by a newer push.
+
+Required repository Actions configuration:
+
+| Name | Kind | Value |
+| --- | --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Secret | CI token with **Account → Cloudflare Pages → Edit**, scoped only to the account owning the production project |
+| `CLOUDFLARE_ACCOUNT_ID` | Variable | Verified account ID owning `shagoto-me.pages.dev` and `shagoto.me` |
+
+An existing `CLOUDFLARE_ACCOUNT_ID` secret remains supported; the variable takes
+precedence. There is no fallback account ID. Never replace an existing secret
+without explicit approval, commit tokens, or use a local Wrangler OAuth token as
+a CI credential. Pages token permissions cover the selected account; they are
+not restricted to one Pages project. No DNS or zone write permission is needed.
+See [Cloudflare's CI upload guide](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/).
+
+Before enabling deployment, inspect the existing Pages project's Git integration.
+For a Direct Upload project, retain its current setup. For a Git-connected
+project, disable automatic production deployments and set preview branch
+selection to none before enabling Actions deployment. Preserve its repository
+connection, domains, and DNS. The read-only CI preflight rejects native builds
+that could duplicate Actions and rejects a similarly named project in another
+account. See [Pages Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/).
+
+After deployment, `scripts/cloudflare_ci.mjs verify` checks the Cloudflare API
+for a successful production deployment matching the workflow commit. It retries
+HTTP checks against that deployment's URL, the Pages origin, and `shagoto.me`,
+requiring the expected homepage identity and `X-Content-Type-Options: nosniff`.
+Failures remain visible in Actions; no automatic rollback or DNS change occurs.
+The workflow summary links the verified deployment. A manual rerun rebuilds the
+selected main commit, so check that it is still the intended production revision.
+
+### Setup inspection, 2026-10-25
+
+The inspected Actions run passed verification and failed because its
+`CLOUDFLARE_API_TOKEN` was empty. Both existing production URLs returned HTTP 200
+and the expected homepage content. The available local Cloudflare OAuth login
+could not access the workflow's previously hardcoded account. Its similarly
+named Pages project uses `shagoto-me-86o.pages.dev` and has no production custom
+domain listed; do not deploy this repository there. Confirm the production
+owner's account before configuring the variable. Native Git settings for the
+production account still require authenticated inspection.
+
+The GitHub connector supports inspecting runs but cannot configure Actions
+secrets. If using GitHub CLI, authenticate with an account authorized to manage
+this repository's Actions secrets. List existing secret and variable names before
+adding any missing entries. Enter a new Cloudflare token through GitHub's secret
+form or the CLI's hidden stdin prompt, never in chat or a command argument.
