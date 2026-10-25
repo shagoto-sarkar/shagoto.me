@@ -1,6 +1,6 @@
 ---
 title: "Log: Zero-Trace Ephemeral Cognitive Journal"
-constraint: "Mathematical impossibility of forensic recovery on untrusted public devices via zero-persistence client policy and dual-tier hybrid envelope cryptography."
+constraint: "Zero-persistence ephemeral note architecture using Web Crypto envelope encryption (RSA-OAEP + AES-GCM) and volatile RAM state to minimize residual forensics on shared devices."
 techStack: ["React 18", "TypeScript", "Tailwind CSS", "Cloudflare Pages", "Cloudflare D1", "Web Crypto API"]
 date: 2026-10-20
 demoVideoAvailable: false
@@ -12,10 +12,10 @@ demoVideoAvailable: false
 
 Modern note-taking tools and digital journals are architected on persistent caching and cloud synchronization. Even when sessions are logged out, persistent local storage (`localStorage`, `IndexedDB`, session tokens, SQLite caches) remains vulnerable to forensic extraction, browser session hijacking, and shoulder-surfing on public, university, or shared laboratory workstations.
 
-For **`log.shagoto.me`**, the mandate was absolute forensic deniability under the **Zero-Trace Public Device Workflow**:
-* **Public Terminal Safety:** A user can sit down at a public computer, unlock the entry interface using a quick PIN, record cognitive thoughts and technical reflections, and lock the screen or close the browser tab with mathematically guaranteed zero residual data remaining on the machine.
-* **Mathematical Inability to Decrypt on Quick PIN:** Unlocking the write-only mode provides the browser with only a public encryption key. Even if an attacker dumps the public device's memory, past journal entries cannot be decrypted.
-* **Strict Zero-Persistence Storage Policy:** No passwords, decrypted notes, tokens, or encryption keys may ever touch `localStorage`, `sessionStorage`, `IndexedDB`, WebSQL, or cookies. All active state lives exclusively in volatile RAM.
+For **`log.shagoto.me`**, the mandate was minimizing local forensics under a **Zero-Persistence Shared Device Workflow**:
+* **Shared Terminal Safety:** A user can sit down at a shared computer, unlock the entry interface using a quick PIN, record cognitive thoughts and technical reflections, and close the tab without writing plaintext to browser disk storage (`localStorage`, `IndexedDB`, WebSQL, or cookies).
+* **Asymmetric Ingestion Isolation:** Unlocking the write-only drop mode provides the browser runtime solely with an RSA public key. An attacker inspecting device memory during capture cannot decrypt past historical entries.
+* **Strict Volatile-Only Storage Policy:** No passwords, decrypted notes, tokens, or private keys touch disk storage APIs. All active note manipulation lives strictly in volatile memory.
 
 ---
 
@@ -87,8 +87,14 @@ To prevent memory retention after session termination, all sensitive variables a
 
 All cognitive thoughts are grouped, searched, and rendered against a strict **Asia/Dhaka (UTC+6)** temporal clock regardless of the client machine's local system timezone. This eliminates fragmented daily logs caused by traveling or misconfigured terminal clocks.
 
+### 5. Threat Model Boundaries
+
+While client-side asymmetric envelope encryption and volatile memory policies protect against post-session local disk forensics and compromised cloud databases, they operate within clear boundary limits:
+- **Client Integrity:** They do not protect against hardware keyloggers, malicious browser extensions installed on shared terminals, or operating system-level swap/pagefile inspection prior to process termination.
+- **Scope:** The system is explicitly designed to defend against passive disk recovery and unauthorized cloud archive traversal, making shared terminal capture substantially safer than persistent web apps.
+
 ---
 
 ## Engineering Takeaways
 
-By implementing client-side asymmetric envelope encryption natively in the browser, `log.shagoto.me` achieves zero-trust cloud storage and complete forensic safety on shared hardware without sacrificing capture speed.
+By implementing client-side asymmetric envelope encryption natively in the browser, `log.shagoto.me` demonstrates how strict zero-persistence client policies and Web Crypto APIs can minimize forensic footprints on shared workstations without sacrificing capture speed.

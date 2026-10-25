@@ -6,22 +6,22 @@ date: 2026-10-23
 demoVideoAvailable: false
 ---
 
-> **Production Application:** [`https://cashapp.shagoto.me`](https://cashapp.shagoto.me) &bull; **Dev Telemetry Monitor:** [`https://dev.cashapp.shagoto.me`](https://dev.cashapp.shagoto.me) &bull; **Architecture:** Cloudflare Pages Functions + Cloudflare D1 (SQLite)
+> **Project Architecture:** Cloudflare Pages Functions + Cloudflare D1 (SQLite) &bull; **Target Staging:** `cashapp.shagoto.me` &bull; **Design Paradigm:** Dual-mode dynamic budget smoothing & two-tap mobile input
 
 ## The Constraint
 
 Conventional personal finance applications suffer from severe interface friction and cognitive overhead. Logging a single in-the-moment purchase typically demands navigating multiple nested dropdowns, selecting accounts, typing merchant names, picking tags, and submitting multi-field forms. Consequently, user compliance breaks down precisely during periods of high-stress or impulsive spending.
 
-For **`cashapp.shagoto.me`**, the mandate was to eliminate behavioral friction while establishing mathematical guarantees against budget overruns:
+For this personal expense governor, the mandate was to eliminate behavioral logging friction while computing deterministic allowance adjustments:
 * **Zero-Scroll Lock-Screen Ergonomics:** The primary logging viewport fits strictly within `100dvh` on mobile with zero vertical scrolling and stationary dialpad anchoring.
-* **Sub-3-Second Two-Tap Commits:** Action 1 types the amount on an oversized high-contrast numeric keypad; Action 2 taps one of six macro-categories (`Meal`, `Coffee`, `Groceries`, `Transit`, `Utility`, `Impulse`). Tapping a category button immediately registers the transaction, updates client state optimistically, resets the keypad, and buffers a 5-second undo toast.
-* **In-the-Moment Pre-Spend Reasoning:** Rather than auditing damage retroactively, the client computes allowance degradation in real-time *as the user types*, displaying the exact mathematical consequence on tomorrow's daily allowance before committing.
+* **Sub-3-Second Two-Tap Commits:** Action 1 types the amount on an oversized numeric keypad; Action 2 taps one of six macro-categories (`Meal`, `Coffee`, `Groceries`, `Transit`, `Utility`, `Impulse`). Tapping a category button registers the transaction locally, updates client state optimistically, resets the keypad, and buffers a 5-second undo toast.
+* **In-the-Moment Pre-Spend Reasoning:** Rather than auditing damage retroactively, the client computes allowance degradation in real-time *as the user types*, displaying the mathematical consequence on tomorrow's daily allowance before committing.
 
 ---
 
 ## The Execution
 
-`cashapp.shagoto.me` is built as an edge-native Single Page Application powered by Cloudflare Pages Functions and a serverless relational Cloudflare D1 database (`cashapp-db`).
+The system is engineered as an edge-native Single Page Application powered by Cloudflare Pages Functions and a serverless relational Cloudflare D1 database (`cashapp-db`).
 
 ### 1. Multi-Tenant Relational Isolation & Architecture
 

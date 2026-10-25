@@ -76,4 +76,5 @@ assert solver.check() == unsat
 
 * **Supervision:** Supervised under Assistant Professor, Department of Computer Science and Engineering, Daffodil International University (DIU).
 * **Current Status:** Thesis Proposal Scaffolding & SMT Axiom Cataloging.
+* **Scope & Research Disclaimer:** All formal models and constraint formulations in this proposal represent preliminary computational abstractions for logic evaluation. They are subject to ongoing academic review and do not constitute clinical prescribing recommendations or medical practice protocols.
 * **Expected Deliverables:** Verified benchmark test suite, formalized SMT-LIB2 guideline library, and reproducible CLI analysis harness.

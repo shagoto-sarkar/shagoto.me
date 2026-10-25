@@ -1,6 +1,6 @@
 # AI Agent Routing Guide & System Prompt (`AGENTS.md`)
 
-> **Instructions for AI Coding Assistants:**  
+> **Instructions for AI Coding Assistants:**
 > Read this guide before inspecting or modifying code. It defines exact file-routing rules, strict architectural invariants, codebase conventions, and do-not-touch zones for `shagoto.me`.
 
 ---
@@ -20,6 +20,7 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
 | **Architecture Diagrams & SVGs** | [`src/assets/diagrams/*.svg`](src/assets/diagrams/)<br>[`scripts/generate_diagrams.js`](scripts/generate_diagrams.js) | [`src/components/ArchitectureDiagram.astro`](src/components/ArchitectureDiagram.astro)<br>[`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) | `src/content/notes/*`<br>`public/fonts/*` |
 | **SEO, Headers & Edge Config** | [`astro.config.mjs`](astro.config.mjs)<br>[`public/_headers`](public/_headers)<br>[`public/robots.txt`](public/robots.txt)<br>[`wrangler.jsonc`](wrangler.jsonc) | [`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | `src/content/*`<br>`src/components/*`<br>`src/assets/*` |
 | **Verification Test Suite** | [`scripts/test_site.js`](scripts/test_site.js) | `package.json` | `public/fonts/*`<br>`src/assets/*` |
+| **Living Documentation & ADRs** | [`docs/*.md`](docs/)<br>[`README.md`](README.md)<br>[`ARCHITECTURE.md`](ARCHITECTURE.md) | [`docs/upgrade/STATE.md`](docs/upgrade/STATE.md)<br>[`docs/upgrade/QA_LOG.md`](docs/upgrade/QA_LOG.md) | `dist/*`<br>`node_modules/*` |
 
 ---
 
@@ -36,14 +37,14 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
 ### 2.3 Test-Critical DOM Hooks & Exact Strings
 [`scripts/test_site.js`](scripts/test_site.js) inspects the compiled `./dist` directory. Modifying or removing any of the following strings or attributes will break CI tests:
 - **Homepage Titles & Headings:**
-  - `Architecting verifiable intelligence`
+  - `Researching reliable intelligence`
   - `Daffodil International University`
-  - `Active Areas of Investigation` (with `Neuro-Symbolic Reasoning`)
-  - `Selected Research` (with `Abductive Neuro-Symbolic Engine`)
-  - `Selected Systems & Projects` (with `911 OpenGL Commemorative Simulation`)
-  - `Recent Notes & Essays`
+  - `Active Areas of Investigation` (with `Neuro-symbolic reasoning` or `Neuro-Symbolic Reasoning`)
+  - `Research & engineering` and `Formal Verification of Cardiorenal-Metabolic Guidelines`
+  - `SerialNow.` and `911 OpenGL Commemorative Simulation`
+  - `From the notebook`
 - **DOM IDs & Classes:**
-  - `#cmd-palette-backdrop`, `#contact-modal-backdrop`, `#copy-email-btn`, `#footer-contact-link`
+  - `#cmd-palette-backdrop`, `#contact-modal-backdrop`, `#copy-email-btn`, `#footer-contact-link`, `#mobile-nav-panel`, `#mobile-menu-btn`
   - `scholarly-viewer`, `openContactModal()`
 - **Verified URLs & Contacts:**
   - `mail.google.com/mail/?view=cm` and `shagotosarkar@gmail.com`
@@ -62,7 +63,7 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
 ### 2.4 Content Collections & Zod Invariants
 - **Schema Validation:** Every `.md` file in [`src/content/`](src/content/) must strictly satisfy the Zod schemas in [`src/content/config.ts`](src/content/config.ts).
 - **Slug Format:** Slugs must be strict lowercase kebab-case (e.g., `cashapp-expense-governor.md`, `serialnow-queue-system.md`).
-- **Diagram IDs:** If a project or research entry includes a diagram, register its mapping in `diagramMap` inside [`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) or [`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro).
+- **Diagram IDs:** If a project or research entry includes a diagram, register its mapping in `diagramMap` inside [`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro), [`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro), or [`src/pages/notes/[...slug].astro`](src/pages/notes/[...slug].astro).
 
 ---
 
@@ -91,4 +92,19 @@ npm run check
 
 # 2. Complete production verification test suite (Build + Diagnostics + test_site.js)
 npm test
+
+# 3. Clean whitespace verification (Must return code 0)
+git diff --check
 ```
+
+---
+
+## 5. Checkpoint Gating Protocol (Strict Stop Rules)
+
+Development on `shagoto.me` adheres to strict human-supervised milestones:
+- **70%** — Foundation release candidate (Design system, global navigation, curated homepage, full archives, living documentation).
+- **80%** — Detail reading experience (Article typography, scholarly viewer, diagram responsiveness).
+- **90%** — Editorial truth audit (All 12 Markdown entries individually audited, accessibility polish).
+- **100%** — Verification matrix, durable state reconciliation, and final handoff.
+
+**Agent Rule:** At each checkpoint gate, ensure all tests pass, update `docs/upgrade/STATE.md` and `docs/upgrade/QA_LOG.md`, deliver the structured report ending with `PAUSED. Reply proceed to continue.`, and **STOP**. Do NOT begin subsequent windows without an explicit user reply of `proceed`.

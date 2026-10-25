@@ -125,49 +125,57 @@ const metaDescription = entry.data.abstract.slice(0, 150);
         <div class="proof-block">
           <div class="proof-block-header">
             <span>SMT-LIB2 Solver Specification</span>
-            <span class="proof-block-tag">Z3 Core</span>
+            <span class="proof-block-tag">Z3 Core (Illustrative Formalization)</span>
           </div>
-          <pre class="astro-code"><code>{entry.slug === 'abductive-neuro-symbolic-engine' ? `; SMT-LIB2 Clause Verification
+          <pre class="astro-code"><code>{entry.slug === 'abductive-neuro-symbolic-engine' ? `; SMT-LIB2 Solver Specification: Illustrative Constraint Formulation
+(set-option :produce-unsat-cores true)
 (set-logic QF_LRA)
+
 (declare-fun egfr () Real)
 (declare-fun serum_k () Real)
 (declare-fun rx_spironolactone () Bool)
 
-; Patient Biomarker Assertions
-(assert (= egfr 24.5))
-(assert (= serum_k 5.4))
-(assert (= rx_spironolactone true))
+; Patient Biomarker Assertions (tracked with :named for unsat core)
+(assert (! (= egfr 24.5) :named patient_egfr))
+(assert (! (= serum_k 5.4) :named patient_serum_k))
+(assert (! (= rx_spironolactone true) :named patient_rx_spironolactone))
 
-; Guideline Safety Invariant (KDIGO / ACC)
-(assert (=> rx_spironolactone (and (>= egfr 30.0) (<= serum_k 5.0))))
+; Guideline Safety Invariant (KDIGO / ACC formalization)
+(assert (! (=> rx_spironolactone (and (>= egfr 30.0) (<= serum_k 5.0))) :named guideline_spironolactone_invariant))
 
-; Solvability Check
+; Solvability Check & Core Extraction
 (check-sat)
 ; Result: unsat
 (get-unsat-core)
-; Conflicting Core: [egfr_bound, serum_k_bound, rx_spironolactone]` : `; SMT-LIB2 Multi-Guideline Encoding
+; Unsat Core: (patient_egfr guideline_spironolactone_invariant patient_rx_spironolactone)` : `; SMT-LIB2 Solver Specification: Multi-Guideline Comorbidity Formulation
+(set-option :produce-unsat-cores true)
 (set-logic QF_LRA)
+
 (declare-fun egfr () Real)
 (declare-fun k_serum () Real)
 (declare-fun rasi_indicated () Bool)
 (declare-fun mra_indicated () Bool)
 
 ; Patient Comorbidity Parameter Set
-(assert (< egfr 30.0))
-(assert (> k_serum 5.2))
-(assert (= rasi_indicated true))
-(assert (= mra_indicated true))
+(assert (! (< egfr 30.0) :named patient_stage4_ckd))
+(assert (! (> k_serum 5.2) :named patient_hyperkalemia))
+(assert (! (= rasi_indicated true) :named kdigo_rasi_recommendation))
+(assert (! (= mra_indicated true) :named ada_mra_recommendation))
 
-; Dual Blockade Invariant Check
-(assert (not (and rasi_indicated mra_indicated)))
+; Formalized Conflict Invariant (Dual Renin-Angiotensin-Aldosterone Blockade Safety Limit)
+(assert (! (not (and rasi_indicated mra_indicated)) :named dual_blockade_contraindication))
+
+; Solvability Verification
 (check-sat)
-; Result: unsat (Conflict Formally Proven)`}</code></pre>
+; Result: unsat (Conflict Formally Isolated)
+(get-unsat-core)
+; Unsat Core: (kdigo_rasi_recommendation ada_mra_recommendation dual_blockade_contraindication)`}</code></pre>
         </div>
 
         <div class="properties-summary">
           <div class="property-row">
             <span class="property-name">Verification Backend</span>
-            <span class="property-val">Microsoft Z3 (SMT-LIB2)</span>
+            <span class="property-val">Microsoft Z3 (SMT-LIB2 Solver)</span>
           </div>
           <div class="property-row">
             <span class="property-name">Logic Theory</span>
@@ -175,7 +183,7 @@ const metaDescription = entry.data.abstract.slice(0, 150);
           </div>
           <div class="property-row">
             <span class="property-name">Decision Nature</span>
-            <span class="property-val">Decidable, Deterministic Proof</span>
+            <span class="property-val">Decidable, Deterministic Constraint Evaluation</span>
           </div>
         </div>
       </div>
@@ -221,6 +229,8 @@ const metaDescription = entry.data.abstract.slice(0, 150);
 
   .breadcrumb-link {
     color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--motion-duration) ease;
   }
 
   .breadcrumb-link:hover {
@@ -231,8 +241,17 @@ const metaDescription = entry.data.abstract.slice(0, 150);
     color: var(--color-border);
   }
 
+  .breadcrumb-current {
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
+  }
+
   .paper-header {
     margin-bottom: var(--space-8);
+    max-width: var(--max-prose-width);
   }
 
   .paper-meta {
@@ -243,7 +262,7 @@ const metaDescription = entry.data.abstract.slice(0, 150);
   }
 
   .paper-date {
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
     font-size: 0.8125rem;
     color: var(--color-text-muted);
   }
@@ -260,16 +279,19 @@ const metaDescription = entry.data.abstract.slice(0, 150);
   }
 
   .paper-title {
-    font-size: 2.75rem;
+    font-family: var(--font-editorial);
+    font-size: clamp(2.1rem, 4vw, 2.75rem);
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.15;
     margin-bottom: var(--space-6);
     color: var(--color-text-primary);
+    letter-spacing: -0.01em;
   }
 
   .notice-box {
     background-color: var(--color-bg-subtle);
     border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
     border-radius: var(--radius-subtle);
     padding: var(--space-4) var(--space-5);
     font-family: var(--font-sans);
@@ -283,23 +305,25 @@ const metaDescription = entry.data.abstract.slice(0, 150);
     background-color: var(--color-bg-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-subtle);
-    padding: var(--space-6);
+    padding: var(--space-5) var(--space-6);
     margin-bottom: var(--space-6);
   }
 
   .abstract-heading {
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--color-text-muted);
+    color: var(--color-accent);
     margin-top: 0;
     margin-bottom: var(--space-2);
   }
 
   .abstract-content {
+    font-family: var(--font-editorial);
     font-size: 1.125rem;
+    line-height: 1.6;
     color: var(--color-text-primary);
     max-width: 100%;
     margin-bottom: 0;

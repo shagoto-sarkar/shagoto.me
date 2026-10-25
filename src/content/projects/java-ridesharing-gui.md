@@ -1,6 +1,6 @@
 ---
 title: "DIU Everywhere"
-constraint: "Designing an asynchronous, multi-threaded campus ride-sharing GUI in Java Swing that guarantees atomic seat allocation and transaction safety over a relational SQL database without UI freezing."
+constraint: "Designing an asynchronous, multi-threaded campus ride-sharing desktop application in Java Swing demonstrating atomic seat allocation and transaction safety over a relational SQL database without UI freezing."
 techStack: ["Java", "Swing", "JDBC", "SQL"]
 date: 2024-11-15
 collaborators: []
@@ -12,7 +12,7 @@ repoUrl: "https://github.com/shagoto-sarkar/diu-everywhere"
 
 Desktop GUI engineering in Java Swing requires strict discipline: the **Event Dispatch Thread (EDT)** must never be blocked by blocking network calls, heavy compute, or disk I/O. Doing so leads to non-responsive interfaces and corrupted UI states.
 
-Furthermore, university ride-sharing entails concurrent transactions where multiple student commuters may attempt to reserve the final available vehicle seat simultaneously, requiring ACID compliance and atomic row locking.
+As an academic software engineering project at Daffodil International University, **DIU Everywhere** explored desktop GUI architecture and transactional data integrity: concurrent student commuters reserving vehicle seats simultaneously require ACID compliance and atomic row locking.
 
 ---
 
@@ -64,7 +64,9 @@ public class BookingWorker extends SwingWorker<Boolean, String> {
 }
 ```
 
-### System Diagnostics Output
+### Transaction Diagnostics Log
+
+*Illustrative transaction log demonstrating concurrent booking and lock acquisition handling:*
 
 ```text
 [DB-POOL] Connection pool initialized: 8 active JDBC connections.

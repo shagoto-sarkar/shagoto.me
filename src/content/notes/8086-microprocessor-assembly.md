@@ -68,7 +68,6 @@ READ_LOOP:
     SHL AX, 1
     SHL AX, 1           ; AX * 8
     ADD BX, AX          ; BX = 10 * BX
-    
     POP AX
     ADD BX, AX          ; Add current digit
     JMP READ_LOOP
@@ -89,4 +88,4 @@ END MAIN
 
 ## Reflections on Hardware Constraints
 
-Writing assembly reinforces the cost of operations that high-level programmers take for granted. Substituting software multiplication with bit shifts (`SHL BX, 1` and `SHL AX, 3`) demonstrates how low-level mechanical awareness yields dramatic instruction cycle savings.
+Writing assembly reinforces the concrete cost of operations that high-level languages abstract away. Substituting general multiplication instructions with bitwise shift-and-add arithmetic (`SHL BX, 1` plus shifts on `AX`) illustrates foundational register-level problem solving in 16-bit real-mode architectures. More importantly, direct register allocation and interrupt handling cultivate an appreciation for how bare hardware coordinates memory and control flow at the silicon boundary.

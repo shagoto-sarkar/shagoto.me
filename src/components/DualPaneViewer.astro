@@ -5,33 +5,56 @@ interface Props {
 }
 
 const {
-  proseTitle = "Methodology & Analysis",
-  proofTitle = "Formal Proofs & Architecture"
+  proseTitle = "Theoretical Methodology & Specifications",
+  proofTitle = "Formal Verification (SMT-LIB2 & Z3) & Architecture"
 } = Astro.props;
 ---
 
 <div class="scholarly-viewer" id="dual-pane-root">
   <div class="viewer-controls">
     <div class="viewer-caption">
-      <span class="viewer-caption-label">View Mode:</span>
-      <span class="viewer-caption-state" id="view-state-indicator">Side-by-Side</span>
+      <span class="viewer-caption-label">Viewing:</span>
+      <span class="viewer-caption-state" id="view-state-indicator">Methodology</span>
     </div>
 
-    <div class="viewer-tabs" role="tablist" aria-label="Research View Options">
-      <button type="button" class="viewer-tab active" data-view="split" id="btn-split" role="tab" aria-selected="true" aria-controls="dual-pane-grid" aria-pressed="true">
-        Side-by-Side
-      </button>
-      <button type="button" class="viewer-tab" data-view="prose" id="btn-prose" role="tab" aria-selected="false" aria-controls="dual-pane-grid" aria-pressed="false">
+    <div class="viewer-actions" role="group" aria-label="Research View Options">
+      <button
+        type="button"
+        class="viewer-btn active"
+        data-view="prose"
+        id="btn-prose"
+        aria-pressed="true"
+      >
         Methodology
       </button>
-      <button type="button" class="viewer-tab" data-view="proof" id="btn-proof" role="tab" aria-selected="false" aria-controls="dual-pane-grid" aria-pressed="false">
-        Proofs &amp; Models
+      <button
+        type="button"
+        class="viewer-btn"
+        data-view="proof"
+        id="btn-proof"
+        aria-pressed="false"
+      >
+        Formal Model &amp; Proofs
+      </button>
+      <button
+        type="button"
+        class="viewer-btn btn-split"
+        data-view="split"
+        id="btn-split"
+        aria-pressed="false"
+      >
+        Side-by-Side (Compare)
       </button>
     </div>
   </div>
 
-  <div class="viewer-grid view-split" id="dual-pane-grid">
-    <section class="viewer-column viewer-prose" id="pane-prose-col" aria-label="Methodology Section">
+  <div class="viewer-grid view-prose" id="dual-pane-grid">
+    <section
+      class="viewer-column viewer-prose"
+      id="pane-prose-col"
+      aria-label="Theoretical Methodology"
+      aria-hidden="false"
+    >
       <div class="column-header">
         <h3 class="column-title">{proseTitle}</h3>
       </div>
@@ -40,7 +63,12 @@ const {
       </div>
     </section>
 
-    <section class="viewer-column viewer-proof" id="pane-proof-col" aria-label="Formal Proofs Section">
+    <section
+      class="viewer-column viewer-proof"
+      id="pane-proof-col"
+      aria-label="Formal Proofs & Architecture"
+      aria-hidden="true"
+    >
       <div class="column-header">
         <h3 class="column-title">{proofTitle}</h3>
       </div>
@@ -69,11 +97,17 @@ const {
     border-bottom: 1px solid var(--color-border);
     font-family: var(--font-sans);
     font-size: 0.8125rem;
+    flex-wrap: wrap;
+    gap: var(--space-3);
   }
 
   .viewer-caption-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     color: var(--color-text-muted);
-    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 6px;
   }
 
   .viewer-caption-state {
@@ -81,93 +115,120 @@ const {
     font-weight: 500;
   }
 
-  .viewer-tabs {
-    display: flex;
-    gap: var(--space-1);
+  .viewer-actions {
+    display: inline-flex;
+    gap: 2px;
     background-color: var(--color-bg-subtle);
     padding: 3px;
     border-radius: var(--radius-subtle);
+    border: 1px solid var(--color-border);
   }
 
-  .viewer-tab {
+  .viewer-btn {
     background: transparent;
     border: none;
-    padding: 4px 10px;
+    padding: 5px 12px;
     font-family: var(--font-sans);
     font-size: 0.8125rem;
     color: var(--color-text-secondary);
     border-radius: var(--radius-subtle);
     cursor: pointer;
     transition: background-color var(--motion-duration) ease, color var(--motion-duration) ease;
+    white-space: nowrap;
   }
 
-  .viewer-tab.active, .viewer-tab:hover {
-    background-color: var(--color-bg-surface);
+  .viewer-btn:hover {
     color: var(--color-text-primary);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .viewer-btn.active {
+    background-color: var(--color-bg-surface);
+    color: var(--color-accent);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Compare button is only visible on wide screens (>= 1200px) */
+  .btn-split {
+    display: none;
+  }
+
+  @media (min-width: 1200px) {
+    .btn-split {
+      display: inline-flex;
+    }
   }
 
   .viewer-grid {
-    display: grid;
-    min-height: 520px;
+    display: block;
+    width: 100%;
   }
 
-  .viewer-grid.view-split {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .viewer-grid.view-prose {
-    grid-template-columns: 1fr;
+  /* Default / Prose mode */
+  .viewer-grid.view-prose .viewer-prose {
+    display: block;
+    max-width: var(--max-prose-width);
+    margin: 0;
   }
 
   .viewer-grid.view-prose .viewer-proof {
     display: none;
   }
 
-  .viewer-grid.view-proof {
-    grid-template-columns: 1fr;
-  }
-
+  /* Proof mode */
   .viewer-grid.view-proof .viewer-prose {
     display: none;
+  }
+
+  .viewer-grid.view-proof .viewer-proof {
+    display: block;
+    max-width: 960px;
+    margin: 0;
+  }
+
+  /* Side-by-side mode (>= 1200px) */
+  @media (min-width: 1200px) {
+    .viewer-grid.view-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .viewer-grid.view-split .viewer-prose {
+      display: block;
+      border-right: 1px solid var(--color-border);
+      max-width: 100%;
+    }
+
+    .viewer-grid.view-split .viewer-proof {
+      display: block;
+      max-width: 100%;
+    }
   }
 
   .viewer-column {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     min-width: 0;
   }
 
-  .viewer-prose {
-    border-right: 1px solid var(--color-border);
-  }
-
-  .viewer-grid.view-prose .viewer-prose {
-    border-right: none;
-  }
-
   .column-header {
-    padding: var(--space-3) var(--space-5);
+    padding: var(--space-3) var(--space-6);
     background-color: var(--color-bg-subtle);
     border-bottom: 1px solid var(--color-border);
   }
 
   .column-title {
-    font-family: var(--font-sans);
-    font-size: 0.8125rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     color: var(--color-text-muted);
     margin: 0;
   }
 
   .column-content {
     padding: var(--space-6);
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex-grow: 1;
     min-width: 0;
   }
 
@@ -177,14 +238,26 @@ const {
     max-width: 100%;
   }
 
-  @media (max-width: 860px) {
-    .viewer-grid.view-split {
-      grid-template-columns: 1fr;
+  @media (max-width: 640px) {
+    .viewer-controls {
+      flex-direction: column;
+      align-items: flex-start;
     }
 
-    .viewer-prose {
-      border-right: none;
-      border-bottom: 1px solid var(--color-border);
+    .viewer-actions {
+      width: 100%;
+      display: flex;
+    }
+
+    .viewer-btn {
+      flex: 1;
+      text-align: center;
+      padding: 6px 8px;
+      font-size: 0.75rem;
+    }
+
+    .column-content {
+      padding: var(--space-4);
     }
   }
 </style>
@@ -196,12 +269,14 @@ const {
 
     const grid = document.getElementById('dual-pane-grid');
     const indicator = document.getElementById('view-state-indicator');
-    const tabs = root.querySelectorAll('.viewer-tab');
+    const buttons = root.querySelectorAll('.viewer-btn');
+    const prosePane = document.getElementById('pane-prose-col');
+    const proofPane = document.getElementById('pane-proof-col');
 
     const labels = {
-      split: 'Side-by-Side',
-      prose: 'Methodology Only',
-      proof: 'Proofs Only'
+      prose: 'Methodology (Reading View)',
+      proof: 'Formal Model & Proofs',
+      split: 'Side-by-Side (Compare)'
     };
 
     function setView(mode) {
@@ -209,37 +284,48 @@ const {
       grid.className = 'viewer-grid view-' + mode;
       indicator.textContent = labels[mode] || mode;
 
-      tabs.forEach(tab => {
-        const isCurrent = tab.getAttribute('data-view') === mode;
+      buttons.forEach(btn => {
+        const isCurrent = btn.getAttribute('data-view') === mode;
         if (isCurrent) {
-          tab.classList.add('active');
-          tab.setAttribute('aria-pressed', 'true');
-          tab.setAttribute('aria-selected', 'true');
+          btn.classList.add('active');
+          btn.setAttribute('aria-pressed', 'true');
         } else {
-          tab.classList.remove('active');
-          tab.setAttribute('aria-pressed', 'false');
-          tab.setAttribute('aria-selected', 'false');
+          btn.classList.remove('active');
+          btn.setAttribute('aria-pressed', 'false');
         }
       });
+
+      if (prosePane && proofPane) {
+        if (mode === 'prose') {
+          prosePane.setAttribute('aria-hidden', 'false');
+          proofPane.setAttribute('aria-hidden', 'true');
+        } else if (mode === 'proof') {
+          prosePane.setAttribute('aria-hidden', 'true');
+          proofPane.setAttribute('aria-hidden', 'false');
+        } else {
+          prosePane.setAttribute('aria-hidden', 'false');
+          proofPane.setAttribute('aria-hidden', 'false');
+        }
+      }
     }
 
-    tabs.forEach((tab, idx) => {
-      tab.addEventListener('click', () => {
-        const mode = tab.getAttribute('data-view');
+    buttons.forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-view');
         if (mode) setView(mode);
       });
 
-      tab.addEventListener('keydown', (e) => {
+      btn.addEventListener('keydown', (e) => {
         let targetIdx = null;
         if (e.key === 'ArrowRight') {
-          targetIdx = (idx + 1) % tabs.length;
+          targetIdx = (idx + 1) % buttons.length;
         } else if (e.key === 'ArrowLeft') {
-          targetIdx = (idx - 1 + tabs.length) % tabs.length;
+          targetIdx = (idx - 1 + buttons.length) % buttons.length;
         }
         if (targetIdx !== null) {
           e.preventDefault();
-          tabs[targetIdx].focus();
-          const mode = tabs[targetIdx].getAttribute('data-view');
+          buttons[targetIdx].focus();
+          const mode = buttons[targetIdx].getAttribute('data-view');
           if (mode) setView(mode);
         }
       });

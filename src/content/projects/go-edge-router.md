@@ -1,6 +1,6 @@
 ---
 title: "Go: Sub-15ms Dynamic Edge Router & Bang Engine"
-constraint: "Sub-15ms global P99 redirect latency across 300+ edge PoPs with non-blocking click telemetry and zero database lookups on hot paths."
+constraint: "Personal dynamic redirect engine designed for sub-15ms edge latency, non-blocking asynchronous telemetry, and zero database lookups on hot paths."
 techStack: ["Cloudflare Workers", "TypeScript", "Hono", "Workers KV", "Cloudflare D1", "Web Crypto API"]
 date: 2026-10-16
 demoVideoAvailable: false
@@ -13,8 +13,8 @@ demoVideoAvailable: false
 Traditional URL shorteners and redirect services rely on centralized database architectures and heavy server-side frameworks. Every redirect incurs cold start penalties, cross-region TLS handshakes, and blocking analytics writes that delay page transitions by 200–600ms.
 
 For **`go.shagoto.me`**, the primary engineering directive was ultra-low-latency edge execution:
-* **Global Sub-15ms Redirects:** Requests must resolve at the nearest edge Point of Presence (PoP) out of 300+ worldwide data centers without hitting centralized origin servers.
-* **Non-Blocking Telemetry:** Analytics recording (IP-less geocoding, user agent parsing, referral source, timestamp) must run strictly off the critical path, adding $0\text{ ms}$ overhead to the HTTP redirect.
+* **Edge Routing Target:** Resolving requests at the nearest edge Point of Presence (PoP) in Cloudflare's global network without querying centralized origin databases on hot paths.
+* **Non-Blocking Telemetry:** Analytics recording (IP-less geocoding, user agent parsing, referral source, timestamp) must run strictly off the critical path via background execution, adding $0\text{ ms}$ user-perceived overhead to the HTTP redirect.
 * **CLI-First Ergonomics:** First-class management through Linux shell pipelines via standard `curl` commands, supporting instant link creation, updates, and format negotiation.
 
 ---
@@ -25,10 +25,10 @@ For **`go.shagoto.me`**, the primary engineering directive was ultra-low-latency
 
 ### 1. Hybrid KV + D1 Storage Architecture
 
-To achieve deterministic sub-15ms execution while preserving full SQL auditability, storage is split into complementary tiers:
-1. **Hot Path (Workers KV):** Global key-value cache with sub-10ms read latencies. The edge worker resolves incoming slugs (`/cv`, `/thesis`, `/meet`) directly from KV cache without querying the relational layer.
+To achieve sub-15ms execution on common paths while preserving relational auditability, storage is split into complementary tiers:
+1. **Hot Path (Workers KV):** Global key-value cache with low single-digit millisecond read latencies. The edge worker resolves incoming slugs (`/cv`, `/thesis`, `/meet`) directly from KV cache without querying the relational layer.
 2. **Cold & Relational Tier (Cloudflare D1):** Serverless SQLite acting as the authoritative source of truth. Handles structured metadata, link updates, access control verification, and click telemetry streams.
-3. **Cache Invalidation:** When a link destination is updated via API or CLI, the worker writes the change to D1 and simultaneously flushes and updates the corresponding KV key across all edge locations.
+3. **Cache Model & Invalidation:** When a link destination is updated via API or CLI, the worker writes the change to D1 and updates the corresponding KV key. Because Workers KV operates on an eventually-consistent replication model (propagating globally within ~60 seconds), hot paths trade strict global instant serializability for deterministic low-latency edge reads.
 
 ### 2. Parameterized "Bang" Routing Engine
 

@@ -65,12 +65,12 @@ if (cvBuffer.subarray(0, 4).toString() === '%PDF') {
 const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8');
 
 const checks = [
-  { name: 'Editorial Identity statement', pass: indexHtml.includes('Architecting verifiable intelligence') },
+  { name: 'Editorial Identity statement', pass: indexHtml.includes('Researching reliable intelligence') },
   { name: 'Affiliation with Daffodil International University', pass: indexHtml.includes('Daffodil International University') },
-  { name: 'Current Focus section (Active Areas of Investigation)', pass: indexHtml.includes('Active Areas of Investigation') && indexHtml.includes('Neuro-Symbolic Reasoning') },
-  { name: 'Selected Research section', pass: indexHtml.includes('Selected Research') && indexHtml.includes('Abductive Neuro-Symbolic Engine') },
-  { name: 'Selected Projects section', pass: indexHtml.includes('Selected Systems &amp; Projects') && indexHtml.includes('911 OpenGL Commemorative Simulation') },
-  { name: 'Recent Notes section', pass: indexHtml.includes('Recent Notes &amp; Essays') },
+  { name: 'Current Focus section (Active Areas of Investigation)', pass: indexHtml.includes('Active Areas of Investigation') && (indexHtml.includes('Neuro-symbolic reasoning') || indexHtml.includes('Neuro-Symbolic Reasoning')) },
+  { name: 'Selected Research section', pass: indexHtml.includes('Research &amp; engineering') && indexHtml.includes('Formal Verification of Cardiorenal-Metabolic Guidelines') },
+  { name: 'Selected Projects section', pass: indexHtml.includes('SerialNow.') && indexHtml.includes('911 OpenGL Commemorative Simulation') },
+  { name: 'Recent Notes section', pass: indexHtml.includes('From the notebook') },
   { name: 'Search overlay present', pass: indexHtml.includes('cmd-palette-backdrop') },
   { name: 'Contact modal markup present', pass: indexHtml.includes('contact-modal-backdrop') },
   { name: 'Web Gmail compose URL present', pass: indexHtml.includes('mail.google.com/mail/?view=cm') },
@@ -93,6 +93,40 @@ for (const c of checks) {
     console.error(`[FAIL] ${c.name}`);
     failed = true;
   }
+}
+
+// Archive integrity checks
+console.log('\n=== ARCHIVE PAGE INTEGRITY CHECKS ===');
+const projectsIndexHtml = fs.readFileSync(path.join(distDir, 'projects/index.html'), 'utf8');
+const researchIndexHtml = fs.readFileSync(path.join(distDir, 'research/index.html'), 'utf8');
+const notesIndexHtml = fs.readFileSync(path.join(distDir, 'notes/index.html'), 'utf8');
+
+const all7ProjectsPresent = [
+  'serialnow-queue-system',
+  'cashapp-expense-governor',
+  'opengl-lower-manhattan',
+  'go-edge-router',
+  'log-cognitive-journal',
+  'js-mini-compiler-ide',
+  'java-ridesharing-gui'
+].every(slug => projectsIndexHtml.includes(`/projects/${slug}`));
+
+const all2ResearchPresent = [
+  'z3-cardiorenal-thesis-proposal',
+  'abductive-neuro-symbolic-engine'
+].every(slug => researchIndexHtml.includes(`/research/${slug}`));
+
+const all3NotesPresent = [
+  'headless-ubuntu-tailscale',
+  '8086-microprocessor-assembly',
+  'moral-complexity-dostoevsky-arcane'
+].every(slug => notesIndexHtml.includes(`/notes/${slug}`));
+
+if (all7ProjectsPresent && all2ResearchPresent && all3NotesPresent) {
+  console.log('[PASS] All 7 projects, 2 research, and 3 notes present in archive indices');
+} else {
+  console.error('[FAIL] One or more items missing from archive indices');
+  failed = true;
 }
 
 // Research page check
@@ -177,8 +211,8 @@ console.log('\n=== SEO & INDEXING ARTIFACT CHECKS ===');
 
 // 1. Robots.txt verification
 const robotsContent = fs.readFileSync(path.join(distDir, 'robots.txt'), 'utf8');
-if (robotsContent.includes('User-agent: *') && 
-    robotsContent.includes('Allow: /') && 
+if (robotsContent.includes('User-agent: *') &&
+    robotsContent.includes('Allow: /') &&
     robotsContent.includes('Sitemap: https://shagoto.me/sitemap-index.xml')) {
   console.log('[PASS] robots.txt contains User-agent: *, Allow: /, and Sitemap index directive');
 } else {
@@ -197,10 +231,10 @@ if (sitemapIndexContent.includes('sitemap-0.xml')) {
   failed = true;
 }
 
-if (sitemap0Content.includes('https://shagoto.me/') && 
-    sitemap0Content.includes('https://shagoto.me/research/') && 
-    sitemap0Content.includes('https://shagoto.me/projects/') && 
-    sitemap0Content.includes('https://shagoto.me/notes/') && 
+if (sitemap0Content.includes('https://shagoto.me/') &&
+    sitemap0Content.includes('https://shagoto.me/research/') &&
+    sitemap0Content.includes('https://shagoto.me/projects/') &&
+    sitemap0Content.includes('https://shagoto.me/notes/') &&
     !sitemap0Content.includes('404')) {
   console.log('[PASS] sitemap-0.xml contains primary canonical routes and excludes 404');
 } else {

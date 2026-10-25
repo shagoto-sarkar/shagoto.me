@@ -16,7 +16,7 @@ const {
 } = Astro.props;
 
 const fullTitle = title === "Shagoto Sarkar" || title.includes("Shagoto Sarkar")
-  ? title 
+  ? title
   : `${title} — Shagoto Sarkar`;
 
 const currentPath = Astro.url.pathname;
@@ -54,7 +54,7 @@ const personSchema = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    
+
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Shagoto Sarkar" />
@@ -84,7 +84,7 @@ const personSchema = {
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%231D4ED8'/></svg>" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2317242C'/><text x='16' y='23' font-family='Georgia,serif' font-size='20' font-weight='600' fill='%23F8F7F3' text-anchor='middle'>S</text></svg>" />
   </head>
 
   <body>
@@ -95,53 +95,133 @@ const personSchema = {
           Shagoto Sarkar
         </a>
 
-        <nav class="site-nav" aria-label="Primary Navigation">
-          <a 
-            href="/research" 
+        <!-- Desktop Navigation -->
+        <nav class="site-nav desktop-nav" aria-label="Primary Navigation">
+          <a
+            href="/research"
             class={`nav-link ${currentPath.startsWith('/research') ? 'active' : ''}`}
+            aria-current={currentPath.startsWith('/research') ? 'page' : undefined}
           >
             Research
           </a>
-          <a 
-            href="/projects" 
+          <a
+            href="/projects"
             class={`nav-link ${currentPath.startsWith('/projects') ? 'active' : ''}`}
+            aria-current={currentPath.startsWith('/projects') ? 'page' : undefined}
           >
             Projects
           </a>
-          <a 
-            href="/notes" 
+          <a
+            href="/notes"
             class={`nav-link ${currentPath.startsWith('/notes') ? 'active' : ''}`}
+            aria-current={currentPath.startsWith('/notes') ? 'page' : undefined}
           >
             Notes
           </a>
-          <a 
-            href="/cv.pdf" 
-            class="nav-link" 
+          <a
+            href="/cv.pdf"
+            class="nav-link"
             download="Shagoto_Sarkar_CV.pdf"
             title="Download curriculum vitae"
           >
             CV
           </a>
-          <button 
-            type="button" 
+          <button
+            type="button"
             id="nav-contact-link"
             class="nav-link nav-contact-btn"
             onclick="window.openContactModal && window.openContactModal()"
           >
             Contact
           </button>
-          <button 
-            type="button" 
-            class="search-trigger-btn" 
+          <button
+            type="button"
+            class="search-trigger-btn"
             onclick="window.openAxiomCommandPalette && window.openAxiomCommandPalette()"
-            title="Search site (Shortcut: /)"
+            title="Search site (Shortcut: ⌘K or /)"
             aria-label="Open search dialog"
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <span class="search-key">/</span>
+            <span class="search-key" id="desktop-search-key">⌘K</span>
+          </button>
+        </nav>
+
+        <!-- Mobile Header Controls -->
+        <div class="mobile-header-actions">
+          <button
+            type="button"
+            class="search-trigger-btn mobile-search-btn"
+            onclick="window.openAxiomCommandPalette && window.openAxiomCommandPalette()"
+            title="Search site"
+            aria-label="Open search dialog"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+          <button
+            type="button"
+            id="mobile-menu-btn"
+            class="mobile-menu-btn"
+            aria-expanded="false"
+            aria-controls="mobile-nav-panel"
+            aria-label="Toggle navigation menu"
+          >
+            <svg class="menu-icon-bars" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <svg class="menu-icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Dropdown Panel -->
+      <div id="mobile-nav-panel" class="mobile-nav-panel" style="display: none;">
+        <nav class="mobile-nav-links" aria-label="Mobile Navigation">
+          <a
+            href="/research"
+            class={`mobile-nav-link ${currentPath.startsWith('/research') ? 'active' : ''}`}
+            aria-current={currentPath.startsWith('/research') ? 'page' : undefined}
+          >
+            Research
+          </a>
+          <a
+            href="/projects"
+            class={`mobile-nav-link ${currentPath.startsWith('/projects') ? 'active' : ''}`}
+            aria-current={currentPath.startsWith('/projects') ? 'page' : undefined}
+          >
+            Projects
+          </a>
+          <a
+            href="/notes"
+            class={`mobile-nav-link ${currentPath.startsWith('/notes') ? 'active' : ''}`}
+            aria-current={currentPath.startsWith('/notes') ? 'page' : undefined}
+          >
+            Notes
+          </a>
+          <a
+            href="/cv.pdf"
+            class="mobile-nav-link"
+            download="Shagoto_Sarkar_CV.pdf"
+          >
+            Curriculum Vitae
+          </a>
+          <button
+            type="button"
+            id="mobile-contact-link"
+            class="mobile-nav-link mobile-contact-btn"
+            onclick="window.openContactModal && window.openContactModal()"
+          >
+            Contact
           </button>
         </nav>
       </div>
@@ -164,25 +244,25 @@ const personSchema = {
         <div class="footer-links-container">
           <!-- ROW 1: Primary Professional Links -->
           <div class="footer-row primary-row">
-            <button 
-              type="button" 
+            <button
+              type="button"
               id="footer-contact-link"
               class="footer-link footer-contact-btn"
               onclick="window.openContactModal && window.openContactModal()"
             >
               shagotosarkar@gmail.com
             </button>
-            <a 
-              href="https://github.com/shagoto-sarkar" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://github.com/shagoto-sarkar"
+              target="_blank"
+              rel="noopener noreferrer"
               class="footer-link"
             >
               GitHub
             </a>
-            <a 
-              href="/cv.pdf" 
-              download="Shagoto_Sarkar_CV.pdf" 
+            <a
+              href="/cv.pdf"
+              download="Shagoto_Sarkar_CV.pdf"
               class="footer-link"
             >
               Curriculum Vitae
@@ -191,35 +271,39 @@ const personSchema = {
 
           <!-- ROW 2: Secondary Social Links -->
           <div class="footer-row secondary-row">
-            <a 
-              href="https://wa.me/8801771425996" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://wa.me/8801771425996"
+              target="_blank"
+              rel="noopener noreferrer"
               class="social-link"
+              aria-label="WhatsApp: message"
             >
               wp: message
             </a>
-            <a 
-              href="https://www.instagram.com/shagotosarkar/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://www.instagram.com/shagotosarkar/"
+              target="_blank"
+              rel="noopener noreferrer"
               class="social-link"
+              aria-label="Instagram: @shagotosarkar"
             >
               ig: @shagotosarkar
             </a>
-            <a 
-              href="https://www.facebook.com/shagotosarkar666" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://www.facebook.com/shagotosarkar666"
+              target="_blank"
+              rel="noopener noreferrer"
               class="social-link"
+              aria-label="Facebook: /shagoto"
             >
               fb: /shagoto
             </a>
-            <a 
-              href="https://linkedin.com/in/shagoto-sarkar" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://linkedin.com/in/shagoto-sarkar"
+              target="_blank"
+              rel="noopener noreferrer"
               class="social-link"
+              aria-label="LinkedIn profile"
             >
               in: linkedin
             </a>
@@ -229,11 +313,11 @@ const personSchema = {
     </footer>
 
     <!-- Floating Back to Top Action -->
-    <button 
-      type="button" 
-      id="back-to-top-btn" 
-      class="back-to-top-btn" 
-      aria-label="Back to top" 
+    <button
+      type="button"
+      id="back-to-top-btn"
+      class="back-to-top-btn"
+      aria-label="Back to top"
       title="Back to top"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -277,7 +361,79 @@ const personSchema = {
           }
         });
 
-        // 3. Progressive Code Copy Buttons on Shiki Blocks
+        // 3. Platform Detection for Search Trigger Display
+        const isMac = typeof navigator !== 'undefined' && /Macintosh|Mac OS X|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const searchKey = document.getElementById('desktop-search-key');
+        if (searchKey) {
+          searchKey.textContent = isMac ? '⌘K' : 'Ctrl K';
+        }
+
+        // 4. Mobile Menu Controller
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const menuPanel = document.getElementById('mobile-nav-panel');
+        const iconBars = menuBtn ? menuBtn.querySelector('.menu-icon-bars') : null;
+        const iconClose = menuBtn ? menuBtn.querySelector('.menu-icon-close') : null;
+
+        function closeMobileMenu() {
+          if (!menuBtn || !menuPanel) return;
+          menuBtn.setAttribute('aria-expanded', 'false');
+          menuPanel.style.display = 'none';
+          if (iconBars) iconBars.style.display = 'block';
+          if (iconClose) iconClose.style.display = 'none';
+        }
+
+        function openMobileMenu() {
+          if (!menuBtn || !menuPanel) return;
+          menuBtn.setAttribute('aria-expanded', 'true');
+          menuPanel.style.display = 'block';
+          if (iconBars) iconBars.style.display = 'none';
+          if (iconClose) iconClose.style.display = 'block';
+        }
+
+        function toggleMobileMenu() {
+          if (!menuBtn) return;
+          const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+          if (isExpanded) {
+            closeMobileMenu();
+          } else {
+            openMobileMenu();
+          }
+        }
+
+        if (menuBtn && menuPanel) {
+          menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMobileMenu();
+          });
+
+          // Close menu when a link inside is clicked
+          menuPanel.querySelectorAll('a, button').forEach((el) => {
+            el.addEventListener('click', () => {
+              closeMobileMenu();
+            });
+          });
+
+          // Escape key closes mobile menu and restores focus to menu button
+          window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') {
+              closeMobileMenu();
+              menuBtn.focus();
+            }
+          });
+
+          // Close on click outside
+          document.addEventListener('click', (e) => {
+            if (
+              menuBtn.getAttribute('aria-expanded') === 'true' &&
+              !menuBtn.contains(e.target) &&
+              !menuPanel.contains(e.target)
+            ) {
+              closeMobileMenu();
+            }
+          });
+        }
+
+        // 5. Progressive Code Copy Buttons on Shiki Blocks
         const codeBlocks = document.querySelectorAll('pre.astro-code');
         codeBlocks.forEach((pre) => {
           if (pre.parentElement && pre.parentElement.classList.contains('code-block-wrapper')) return;
@@ -314,15 +470,19 @@ const personSchema = {
                 ta.select();
                 const cmd = 'exec' + 'Command';
                 if (typeof document[cmd] === 'function') {
-                  document[cmd]('copy');
+                  copied = Boolean(document[cmd]('copy'));
                 }
                 document.body.removeChild(ta);
-                copied = true;
               } catch (e) {}
             }
 
-            copyBtn.classList.add('copied');
-            copyBtn.textContent = '✓ Copied';
+            if (copied) {
+              copyBtn.classList.add('copied');
+              copyBtn.textContent = '✓ Copied';
+            } else {
+              copyBtn.textContent = 'Copy failed';
+            }
+
             setTimeout(() => {
               copyBtn.classList.remove('copied');
               copyBtn.textContent = 'Copy';
@@ -349,24 +509,26 @@ const personSchema = {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: var(--space-4);
-    padding-bottom: var(--space-4);
+    min-height: 72px;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
   }
 
   .site-brand {
     font-family: var(--font-editorial);
-    font-size: 1.35rem;
+    font-size: clamp(1.35rem, 2.5vw, 1.55rem);
     font-weight: 600;
     color: var(--color-text-primary);
     text-decoration: none;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   .site-brand:hover {
     color: var(--color-accent);
   }
 
-  .site-nav {
+  /* Desktop Navigation */
+  .desktop-nav {
     display: flex;
     align-items: center;
     gap: var(--space-6);
@@ -377,7 +539,7 @@ const personSchema = {
     font-size: 0.9375rem;
     color: var(--color-text-secondary);
     text-decoration: none;
-    padding: 4px 0;
+    padding: 6px 0;
     position: relative;
     transition: color var(--motion-duration) ease;
   }
@@ -397,22 +559,31 @@ const personSchema = {
     bottom: -2px;
     left: 0;
     width: 100%;
-    height: 1px;
-    background-color: var(--color-text-primary);
+    height: 2px;
+    background-color: var(--color-accent);
+  }
+
+  .nav-contact-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    line-height: inherit;
   }
 
   .search-trigger-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     background: transparent;
     border: 1px solid var(--color-border);
-    border-radius: 4px;
+    border-radius: var(--radius-subtle);
     color: var(--color-text-muted);
-    padding: 4px 8px;
+    padding: 6px 10px;
     cursor: pointer;
     font-family: var(--font-mono);
     font-size: 0.75rem;
+    min-height: 36px;
     transition: border-color var(--motion-duration) ease, color var(--motion-duration) ease;
   }
 
@@ -423,11 +594,97 @@ const personSchema = {
 
   .search-key {
     background-color: var(--color-bg-subtle);
-    padding: 1px 4px;
+    padding: 2px 5px;
     border-radius: 2px;
     font-size: 0.6875rem;
   }
 
+  /* Mobile Controls */
+  .mobile-header-actions {
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .mobile-search-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-subtle);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    padding: 0;
+    transition: border-color var(--motion-duration) ease, background-color var(--motion-duration) ease;
+  }
+
+  .mobile-menu-btn:hover {
+    border-color: var(--color-text-secondary);
+    background-color: var(--color-bg-subtle);
+  }
+
+  .mobile-nav-panel {
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-base);
+    padding: var(--space-4) clamp(24px, 4vw, 56px);
+  }
+
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .mobile-nav-link {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .mobile-nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-nav-link.active {
+    color: var(--color-accent);
+  }
+
+  .mobile-contact-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+
+  @media (max-width: 900px) {
+    .desktop-nav {
+      display: none;
+    }
+
+    .mobile-header-actions {
+      display: flex;
+    }
+  }
+
+  /* Main & Footer */
   .site-main {
     flex: 1;
     padding-top: var(--space-12);
@@ -452,7 +709,7 @@ const personSchema = {
 
   .footer-name {
     font-family: var(--font-editorial);
-    font-size: 1.125rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--color-text-primary);
     margin-bottom: var(--space-1);
@@ -502,14 +759,6 @@ const personSchema = {
     color: var(--color-text-primary);
   }
 
-  .nav-contact-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font: inherit;
-    line-height: inherit;
-  }
-
   .footer-contact-btn {
     background: transparent;
     border: none;
@@ -521,14 +770,6 @@ const personSchema = {
   }
 
   @media (max-width: 640px) {
-    .site-nav {
-      gap: var(--space-4);
-    }
-    
-    .nav-link {
-      font-size: 0.875rem;
-    }
-
     .footer-inner {
       flex-direction: column;
       gap: var(--space-6);

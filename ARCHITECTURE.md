@@ -1,11 +1,11 @@
 # System Architecture & Technical Specification (`ARCHITECTURE.md`)
 
-> **Target:** `shagoto.me`  
-> **Status:** Production Ground-Truth Specification  
-> **Framework:** Astro 5.x (`output: 'static'`) + TypeScript (strict mode)  
-> **Styling:** Vanilla CSS (`AXIOM Design System v2` — Refined Technical Editorialism)  
-> **Deployment:** Cloudflare Pages (Serverless Edge CDN + Global Anycast Routing)  
-> **Client Runtime:** Zero UI framework runtime (No React, Vue, Svelte, or Tailwind)  
+> **Target:** `shagoto.me`
+> **Status:** Production Ground-Truth Specification
+> **Framework:** Astro 5.x (`output: 'static'`) + TypeScript (strict mode)
+> **Styling:** Vanilla CSS (`Quiet Precision Design System` — Refined Technical Editorialism)
+> **Deployment:** Cloudflare Pages (Serverless Edge CDN + Global Anycast Routing)
+> **Client Runtime:** Zero UI framework runtime (No React, Vue, Svelte, or Tailwind)
 
 ---
 
@@ -48,7 +48,7 @@
 
 ---
 
-## 2. Editorial Identity & Design System (AXIOM v2)
+## 2. Editorial Identity & Design System (Quiet Precision)
 
 The design direction is **Refined Technical Editorialism**—presenting the publication as a computer science researcher and systems engineer.
 
@@ -66,18 +66,19 @@ All font files are self-hosted `.woff2` binaries stored in [`public/fonts/`](pub
 ### 2.3 Color System (`src/styles/global.css`)
 
 ```css
-/* Default: Warm Off-White Editorial */
+/* Default: Warm Archival Paper (Light Mode) */
 :root {
-  --color-bg-base: #FAFAF8;          /* Warm archival paper */
-  --color-bg-surface: #FFFFFF;       /* Card & elevated element background */
-  --color-bg-subtle: #F2F2EE;        /* Secondary background & chip fill */
-  --color-text-primary: #121212;     /* High-contrast ink */
-  --color-text-secondary: #555555;   /* Secondary prose & metadata */
-  --color-text-muted: #767676;       /* Subdued timestamps & labels */
-  --color-border: #E5E5E0;           /* Structural hairline boundary */
-  --color-border-subtle: #EBEBE6;    /* Subtle division border */
-  --color-accent: #1D4ED8;           /* Deep cobalt accent */
-  --color-accent-subtle: #EFF6FF;    /* Tinted accent surface */
+  --color-bg-base: #F8F7F3;          /* Warm archival paper */
+  --color-bg-surface: #FFFFFF;       /* Card & elevated surface background */
+  --color-bg-subtle: #F0EFEA;        /* Secondary background & chip fill */
+  --color-text-primary: #1A2126;     /* Deep charcoal ink */
+  --color-text-secondary: #4A5560;   /* Secondary prose & metadata */
+  --color-text-muted: #73808C;       /* Subdued timestamps & labels */
+  --color-border: #E2E0D8;           /* Structural hairline boundary */
+  --color-border-subtle: #ECEAE2;    /* Subtle division border */
+  --color-accent: #234F65;           /* Deep slate-teal accent */
+  --color-accent-subtle: #EBF2F5;    /* Tinted accent surface */
+  --color-code-bg: #EBEBE6;          /* Code snippet background */
 
   /* Spacing Scale */
   --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
@@ -91,19 +92,20 @@ All font files are self-hosted `.woff2` binaries stored in [`public/fonts/`](pub
   --motion-duration: 150ms;
 }
 
-/* Editorial Dark Theme */
+/* Deep Slate Technical Editorial (Dark Mode) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg-base: #141415;
-    --color-bg-surface: #1B1B1D;
-    --color-bg-subtle: #222225;
-    --color-text-primary: #ECECEC;
-    --color-text-secondary: #A0A0A5;
-    --color-text-muted: #7A7A80;
-    --color-border: #2A2A2E;
-    --color-border-subtle: #242428;
-    --color-accent: #60A5FA;
-    --color-accent-subtle: #1E293B;
+    --color-bg-base: #11191D;
+    --color-bg-surface: #182328;
+    --color-bg-subtle: #1F2D34;
+    --color-text-primary: #ECEFF1;
+    --color-text-secondary: #9BAAB4;
+    --color-text-muted: #6B7C87;
+    --color-border: #26363E;
+    --color-border-subtle: #1D2A31;
+    --color-accent: #98C9D7;
+    --color-accent-subtle: #18262C;
+    --color-code-bg: #18262C;
   }
 }
 ```
@@ -126,12 +128,12 @@ Content collections are strictly validated at build time via Zod in [`src/conten
 
 All components are written in native Astro templates (`.astro`) with zero client framework dependencies:
 
-- **`BaseLayout.astro` (`src/layouts/BaseLayout.astro`):** Root HTML shell. Injects self-hosted `@font-face` declarations, canonical tags, Schema.org `Person` JSON-LD metadata, top navigation header (with search trigger), and footer (with social links and contact modal trigger).
+- **`BaseLayout.astro` (`src/layouts/BaseLayout.astro`):** Root HTML shell. Injects self-hosted `@font-face` declarations, canonical tags, Schema.org `Person` JSON-LD metadata, responsive top navigation header (with desktop nav links, mobile drawer menu `#mobile-nav-panel`, and search trigger), and footer (with social links and contact modal trigger).
 - **`CommandPalette.astro` (`src/components/CommandPalette.astro`):** Global search dialog (`Cmd+K` / `Ctrl+K`). Features instant client-side fuzzy searching across indexed research, projects, notes, and quick navigation actions with keyboard selection (`ArrowUp`, `ArrowDown`, `Enter`).
 - **`ContactModal.astro` (`src/components/ContactModal.astro`):** Accessible contact dialog triggered by header/footer actions. Includes 1-click email copy (`navigator.clipboard`) with visual feedback, web Gmail direct compose link, and verified external profiles.
 - **`DualPaneViewer.astro` (`src/components/DualPaneViewer.astro`):** Scholarly dual-pane viewer for research briefs displaying side-by-side paper abstracts and executable Z3 SMT-LIB2 solver specifications.
 - **`ArchitectureDiagram.astro` (`src/components/ArchitectureDiagram.astro`):** Accessible SVG container embedding build-time architecture SVGs with responsive aspect ratio and full screen-reader `aria-label` descriptors.
-- **`ExecutionCard.astro` (`src/components/ExecutionCard.astro`):** High-density editorial card component used across the homepage and archive listing indexes.
+- **`ExecutionCard.astro` (`src/components/ExecutionCard.astro`):** Accessible editorial row component used across archive listing indexes (`/projects`, `/research`, `/notes`). Features a 3-column layout (metadata, content/tags, action link) with selectable text and clean hover elevation.
 
 ---
 
@@ -213,6 +215,26 @@ npm test
 # Production build only (dist/)
 npm run build
 
-# Direct manual terminal deploy via Wrangler
+# Direct manual terminal deploy via Wrangler (PROHIBITED without explicit client approval)
 npm run deploy
 ```
+
+---
+
+## 9. Canonical Living Documentation System
+
+The operational truth of `shagoto.me` is maintained in the following canonical documentation hierarchy:
+
+| Document | Purpose & Scope |
+| :--- | :--- |
+| [`README.md`](README.md) | High-level introduction, tech stack summary, entry-point tree, and operational CLI commands. |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Ground-truth technical specification, system topology, component catalog, and edge configuration. |
+| [`AGENTS.md`](AGENTS.md) | AI agent routing map, codebase conventions, invariant tests, and checkpoint gating protocol. |
+| [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) | Quiet Precision tokens, typography clamp curves, spacing scale, and responsive layout constraints. |
+| [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md) | Content authoring rules, Zod schemas, honesty standards, and diagram registration procedures. |
+| [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) | Workstation setup, pre-commit quality gate sequence, and visual QA matrix. |
+| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Read-only Cloudflare Pages architecture, CI/CD secrets reference, and safety directives. |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Architectural Decision Records (ADRs 001–005) documenting technology, design, and scope rationale. |
+| [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Chronological factual changelog of features, design changes, and architectural fixes. |
+| [`docs/upgrade/STATE.md`](docs/upgrade/STATE.md) | Durable resumption ledger tracking work units, last-known-good validations, and pause status. |
+| [`docs/upgrade/QA_LOG.md`](docs/upgrade/QA_LOG.md) | Detailed verification audit ledger recording CLI outputs, route checks, and viewport test evidence. |

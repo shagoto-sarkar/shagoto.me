@@ -1,173 +1,350 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ExecutionCard from '../components/ExecutionCard.astro';
 import { getCollection } from 'astro:content';
 
 const allResearch = await getCollection('research');
 const allProjects = await getCollection('projects');
 const allNotes = await getCollection('notes');
 
-// Sort entries chronologically
-const sortedResearch = [...allResearch].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const sortedProjects = [...allProjects].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const sortedNotes = [...allNotes].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// Curated selections as prescribed by Quiet Precision master directive
+const featuredResearch = allResearch.find(item => item.slug === 'z3-cardiorenal-thesis-proposal') || allResearch[0];
+const serialNow = allProjects.find(item => item.slug === 'serialnow-queue-system');
+const cashApp = allProjects.find(item => item.slug === 'cashapp-expense-governor');
+const openglSim = allProjects.find(item => item.slug === 'opengl-lower-manhattan');
+
+const noteUbuntu = allNotes.find(item => item.slug === 'headless-ubuntu-tailscale') || allNotes[0];
+const noteDostoevsky = allNotes.find(item => item.slug === 'moral-complexity-dostoevsky-arcane') || allNotes[1];
+
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short' }).format(date);
+};
 ---
 
-<BaseLayout 
+<BaseLayout
   title="Shagoto Sarkar"
-  description="Computer Science researcher and software engineer specializing in Neuro-Symbolic AI, formal verification, and low-level systems."
+  description="Computer Science researcher and software engineer specializing in Neuro-Symbolic AI, formal verification, and systems engineering."
 >
   <div class="site-container">
     <!-- 01 — IDENTITY HERO -->
     <section class="hero-section" aria-labelledby="hero-title">
-      <div class="hero-intro">
-        <span class="eyebrow">Computer Science &bull; Systems &bull; Research</span>
-        <h1 id="hero-title" class="hero-heading">
-          Architecting verifiable intelligence through deterministic rigor.
-        </h1>
-        <div class="hero-prose prose">
-          <p>
-            I am an undergraduate researcher and software engineer at Daffodil International University in Dhaka. 
-            My work explores the intersection of <strong>probabilistic machine learning</strong> and 
-            <strong>formal verification</strong>—integrating Large Language Models with SMT solvers 
-            (Microsoft Z3) to eliminate hallucinations in safety-critical clinical environments.
-          </p>
-          <p>
-            In parallel, I build low-level systems in C++ and manage headless Unix infrastructure, 
-            driven by an interest in computational efficiency, memory guarantees, and foundational software engineering.
-          </p>
+      <div class="hero-layout">
+        <div class="hero-main">
+          <span class="eyebrow hero-eyebrow">SHAGOTO SARKAR &nbsp;/&nbsp; RESEARCH &amp; ENGINEERING</span>
+          <h1 id="hero-title" class="hero-heading">
+            Researching reliable intelligence. Building thoughtful systems.
+          </h1>
+          <div class="hero-prose">
+            <p class="hero-lead">
+              I am a Computer Science &amp; Engineering undergraduate at Daffodil International University. My work explores neuro-symbolic AI and formal verification, alongside software systems built for practical, human-centered use.
+            </p>
+            <p class="hero-sublead">
+              From clinical reasoning models to web applications and low-level computing, I care about clarity, correctness, and useful execution.
+            </p>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#selected-work" class="button primary">Explore selected work</a>
+            <a href="/research" class="button">Research</a>
+            <a href="/cv.pdf" class="button" download="Shagoto_Sarkar_CV.pdf">Curriculum vitae</a>
+          </div>
         </div>
 
-        <div class="hero-links">
-          <a href="/research" class="button primary">Explore Research</a>
-          <a href="/projects" class="button">View Projects</a>
-          <a href="/cv.pdf" class="button" download="Shagoto_Sarkar_CV.pdf">Download CV</a>
-        </div>
+        <aside class="hero-rail" aria-label="Current status and location">
+          <div class="rail-card">
+            <div class="rail-group">
+              <div class="rail-label">CURRENTLY</div>
+              <ol class="rail-list">
+                <li>
+                  <span class="rail-num">01</span>
+                  <span class="rail-text">Neuro-symbolic reasoning &amp; formal verification</span>
+                </li>
+                <li>
+                  <span class="rail-num">02</span>
+                  <span class="rail-text">Building human-centered software systems</span>
+                </li>
+              </ol>
+            </div>
+            <div class="rail-divider"></div>
+            <div class="rail-group">
+              <div class="rail-label">BASED IN</div>
+              <div class="rail-val">Dhaka, Bangladesh</div>
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
 
     <hr class="hairline section-divider" />
 
-    <!-- 05 — CURRENT FOCUS (Subtle Informational Callout) -->
-    <section class="focus-section" aria-label="Current research and engineering focus">
+    <!-- 02 — SELECTED WORK (THE CENTRAL SHOWCASE) -->
+    <section id="selected-work" class="work-section" aria-labelledby="work-heading">
+      <div class="section-intro">
+        <span class="eyebrow">SELECTED WORK</span>
+        <h2 id="work-heading" class="section-heading">Research &amp; engineering</h2>
+        <p class="section-summary">A few projects and investigations, from formal reasoning to useful software.</p>
+      </div>
+
+      <!-- A. FEATURED RESEARCH -->
+      <div class="featured-research-panel">
+        <div class="featured-research-body">
+          <span class="eyebrow panel-eyebrow">RESEARCH / UNDERGRADUATE THESIS PROPOSAL</span>
+          <h3 class="featured-research-title">
+            <a href={`/research/${featuredResearch.slug}`}>
+              Formal Verification of Cardiorenal-Metabolic Guidelines
+            </a>
+          </h3>
+          <p class="featured-research-desc">
+            Formalizing intersecting cardiovascular, renal, and metabolic clinical guideline constraints into first-order logic and SMT satisfiability specifications to verify multi-morbidity polypharmacy rules.
+          </p>
+          <div class="panel-meta-tags">
+            <span class="meta-pill">Proposal</span>
+            <span class="meta-sep">&bull;</span>
+            <span class="meta-pill">Formal Methods</span>
+            <span class="meta-sep">&bull;</span>
+            <span class="meta-pill">Z3 Theorem Prover</span>
+          </div>
+          <div class="panel-cta">
+            <a href={`/research/${featuredResearch.slug}`} class="editorial-link">
+              Read research proposal &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="featured-research-rail">
+          <div class="pipeline-title">Methodological Pipeline</div>
+          <div class="pipeline-flow">
+            <div class="pipeline-step">
+              <span class="step-num">01</span>
+              <span class="step-title">Clinical Guidelines</span>
+              <span class="step-sub">KDIGO &bull; ADA &bull; ACC/AHA</span>
+            </div>
+            <div class="pipeline-arrow">&darr;</div>
+            <div class="pipeline-step">
+              <span class="step-num">02</span>
+              <span class="step-title">First-Order Constraints</span>
+              <span class="step-sub">Typed Prescriptions &amp; Labs</span>
+            </div>
+            <div class="pipeline-arrow">&darr;</div>
+            <div class="pipeline-step">
+              <span class="step-num">03</span>
+              <span class="step-title">SMT Verification</span>
+              <span class="step-sub">Z3 SAT / UNSAT Conflict Check</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B. THREE SELECTED ENGINEERING PROJECTS -->
+      <div class="engineering-showcase">
+        <div class="projects-featured-grid">
+          <!-- Primary Lead: SerialNow -->
+          {serialNow && (
+            <article class="featured-project-card lead-card">
+              <div class="project-card-top">
+                <span class="eyebrow project-eyebrow">ENGINEERING / QUEUE ARBITRATION</span>
+                <span class="status-badge">Design Prototype</span>
+              </div>
+              <h3 class="project-card-title">
+                <a href={`/projects/${serialNow.slug}`}>SerialNow.</a>
+              </h3>
+              <p class="project-card-desc">
+                Outpatient clinic queue arbitration system. Features receptionist-first batch workflows, deterministic dual-lane rotation, and privacy-preserving patient transparency.
+              </p>
+              <div class="project-tech-strip">
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-sep">&bull;</span>
+                <span class="tech-tag">Cloudflare Workers</span>
+                <span class="tech-sep">&bull;</span>
+                <span class="tech-tag">Redis</span>
+              </div>
+              <div class="project-card-action">
+                <a href={`/projects/${serialNow.slug}`} class="editorial-link">
+                  Read case study &rarr;
+                </a>
+              </div>
+            </article>
+          )}
+
+          <!-- Secondary Feature: CashApp -->
+          {cashApp && (
+            <article class="featured-project-card secondary-card">
+              <div class="project-card-top">
+                <span class="eyebrow project-eyebrow">ENGINEERING / FINANCIAL TELEMETRY</span>
+                <span class="status-badge">Production Prototype</span>
+              </div>
+              <h3 class="project-card-title">
+                <a href={`/projects/${cashApp.slug}`}>CashApp</a>
+              </h3>
+              <p class="project-card-desc">
+                Human-centered student expense governor. Features Monthly and Hustle modes with partitioned Cloudflare D1 SQLite storage for dynamic budgeting telemetry.
+              </p>
+              <div class="project-tech-strip">
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-sep">&bull;</span>
+                <span class="tech-tag">Hono</span>
+                <span class="tech-sep">&bull;</span>
+                <span class="tech-tag">Cloudflare D1</span>
+              </div>
+              <div class="project-card-action">
+                <a href={`/projects/${cashApp.slug}`} class="editorial-link">
+                  Read case study &rarr;
+                </a>
+              </div>
+            </article>
+          )}
+        </div>
+
+        <!-- Craft/System Counterpoint: 911 OpenGL Simulation -->
+        {openglSim && (
+          <article class="system-counterpoint-row">
+            <div class="counterpoint-main">
+              <span class="eyebrow project-eyebrow">ENGINEERING / GRAPHICS PIPELINE &bull; COLLABORATION WITH MAHADI</span>
+              <h3 class="counterpoint-title">
+                <a href={`/projects/${openglSim.slug}`}>911 OpenGL Commemorative Simulation</a>
+              </h3>
+              <p class="counterpoint-desc">
+                Real-time C++ rendering pipeline sustaining 60 FPS across dynamic scene graphs, vertex buffer objects, and custom GLSL illumination shaders.
+              </p>
+            </div>
+            <div class="counterpoint-aside">
+              <div class="project-tech-strip">
+                <span class="tech-tag">C++</span>
+                <span class="tech-sep">&bull;</span>
+                <span class="tech-tag">OpenGL</span>
+                <span class="tech-sep">&bull;</span>
+                <span class="tech-tag">GLSL</span>
+              </div>
+              <a href={`/projects/${openglSim.slug}`} class="editorial-link">
+                Read case study &rarr;
+              </a>
+            </div>
+          </article>
+        )}
+      </div>
+
+      <!-- C. ARCHIVE FOOTER LINKS -->
+      <div class="work-footer-links">
+        <a href="/projects" class="archive-nav-link">
+          Browse all {allProjects.length} projects &rarr;
+        </a>
+        <a href="/research" class="archive-nav-link">
+          All research ({allResearch.length}) &rarr;
+        </a>
+      </div>
+    </section>
+
+    <hr class="hairline section-divider" />
+
+    <!-- 03 — CURRENT FOCUS (TYPOGRAPHIC EDITORIAL RAIL) -->
+    <section class="focus-section" aria-labelledby="focus-heading">
       <div class="focus-header">
-        <span class="eyebrow">Current Focus</span>
-        <h2 class="focus-title">Active Areas of Investigation</h2>
+        <span class="eyebrow">ACTIVE INVESTIGATION</span>
+        <h2 id="focus-heading" class="section-heading">Active Areas of Investigation</h2>
       </div>
-      <div class="focus-grid">
-        <div class="focus-item">
-          <h3 class="focus-topic">Neuro-Symbolic Reasoning</h3>
-          <p class="focus-desc">Bridging unstructured clinical narratives to typed First-Order Logic constraints via SMT theorem provers.</p>
+
+      <div class="focus-rail-grid">
+        <div class="focus-statement">
+          <div class="focus-num">01</div>
+          <div class="focus-body">
+            <h3 class="focus-name">Neuro-symbolic reasoning</h3>
+            <p class="focus-summary">
+              Structured extraction from natural clinical narratives, explicit assumption modeling, and satisfiability verification using first-order SMT solvers.
+            </p>
+          </div>
         </div>
-        <div class="focus-item">
-          <h3 class="focus-topic">Clinical Guideline Formalization</h3>
-          <p class="focus-desc">Modeling polypharmacy contraindications across concurrent CKD, diabetes, and heart failure protocols.</p>
+
+        <div class="focus-statement">
+          <div class="focus-num">02</div>
+          <div class="focus-body">
+            <h3 class="focus-name">Clinical guideline formalization</h3>
+            <p class="focus-summary">
+              Modeling conflicts and polypharmacy consistency in multi-morbidity CKD, diabetes, and cardiovascular recommendations as formal constraint abstractions.
+            </p>
+          </div>
         </div>
-        <div class="focus-item">
-          <h3 class="focus-topic">Bare-Metal Systems</h3>
-          <p class="focus-desc">Low-level graphics pipelines, deterministic 60fps frame scheduling in C++, and headless server orchestration.</p>
+
+        <div class="focus-statement">
+          <div class="focus-num">03</div>
+          <div class="focus-body">
+            <h3 class="focus-name">Systems engineering</h3>
+            <p class="focus-summary">
+              Small, fast, maintainable software systems, deterministic graphics rendering in C++, and reliable headless Unix infrastructure.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
     <hr class="hairline section-divider" />
 
-    <!-- 03 — RESEARCH SECTION -->
-    <section class="content-section" aria-labelledby="research-heading">
-      <div class="section-top">
-        <div>
-          <span class="eyebrow">Academic Work</span>
-          <h2 id="research-heading" class="section-heading">Selected Research</h2>
-        </div>
-        <a href="/research" class="section-more-link">View all research &rarr;</a>
+    <!-- 04 — FROM THE NOTEBOOK -->
+    <section class="notebook-section" aria-labelledby="notebook-heading">
+      <div class="section-intro">
+        <span class="eyebrow">NOTES &amp; ESSAYS</span>
+        <h2 id="notebook-heading" class="section-heading">From the notebook</h2>
+        <p class="section-summary">Recent notes, systems engineering logs, and technical essays.</p>
       </div>
 
-      <div class="editorial-grid">
-        {sortedResearch.map((item) => (
-          <ExecutionCard
-            href={`/research/${item.slug}`}
-            title={item.data.title}
-            subtitle={item.data.supervisor ? `Supervised by: ${item.data.supervisor}` : undefined}
-            description={item.data.abstract}
-            date={item.data.date}
-            tags={item.data.tags}
-            status={item.data.status}
-            isProposal={item.data.isProposal}
-            actionText="Read research brief &rarr;"
-          />
-        ))}
-      </div>
-    </section>
+      <div class="notebook-rows">
+        {noteUbuntu && (
+          <article class="notebook-row">
+            <div class="notebook-meta">
+              <span class="notebook-category">Infrastructure</span>
+              <time class="notebook-date">{formatDate(noteUbuntu.data.date)}</time>
+            </div>
+            <div class="notebook-content">
+              <h3 class="notebook-title">
+                <a href={`/notes/${noteUbuntu.slug}`}>{noteUbuntu.data.title}</a>
+              </h3>
+              <p class="notebook-desc">
+                Practical field notes on deploying headless Linux servers on private WireGuard overlay mesh networks with automated service management.
+              </p>
+            </div>
+            <div class="notebook-action">
+              <a href={`/notes/${noteUbuntu.slug}`} class="row-arrow" aria-label={`Read ${noteUbuntu.data.title}`}>&rarr;</a>
+            </div>
+          </article>
+        )}
 
-    <hr class="hairline section-divider" />
-
-    <!-- 02 — SELECTED WORK (PROJECTS) -->
-    <section class="content-section" aria-labelledby="projects-heading">
-      <div class="section-top">
-        <div>
-          <span class="eyebrow">Engineering</span>
-          <h2 id="projects-heading" class="section-heading">Selected Systems &amp; Projects</h2>
-        </div>
-        <a href="/projects" class="section-more-link">View all projects &rarr;</a>
-      </div>
-
-      <div class="editorial-grid three-col">
-        {sortedProjects.map((item) => (
-          <ExecutionCard
-            href={`/projects/${item.slug}`}
-            title={item.data.title}
-            subtitle={item.data.collaborators?.length ? `In collaboration with ${item.data.collaborators.join(', ')}` : undefined}
-            description={item.data.constraint}
-            date={item.data.date}
-            tags={item.data.techStack}
-            category="Project"
-            actionText="Explore technical brief &rarr;"
-          />
-        ))}
-      </div>
-    </section>
-
-    <hr class="hairline section-divider" />
-
-    <!-- 04 — THINKING & NOTES -->
-    <section class="content-section" aria-labelledby="notes-heading">
-      <div class="section-top">
-        <div>
-          <span class="eyebrow">Reflections &amp; Logs</span>
-          <h2 id="notes-heading" class="section-heading">Recent Notes &amp; Essays</h2>
-        </div>
-        <a href="/notes" class="section-more-link">View all notes &rarr;</a>
+        {noteDostoevsky && (
+          <article class="notebook-row">
+            <div class="notebook-meta">
+              <span class="notebook-category">Philosophy</span>
+              <time class="notebook-date">{formatDate(noteDostoevsky.data.date)}</time>
+            </div>
+            <div class="notebook-content">
+              <h3 class="notebook-title">
+                <a href={`/notes/${noteDostoevsky.slug}`}>{noteDostoevsky.data.title}</a>
+              </h3>
+              <p class="notebook-desc">
+                A critical inquiry into systemic determinism, moral friction, and tragic necessity across classical Russian literature and contemporary narrative animation.
+              </p>
+            </div>
+            <div class="notebook-action">
+              <a href={`/notes/${noteDostoevsky.slug}`} class="row-arrow" aria-label={`Read ${noteDostoevsky.data.title}`}>&rarr;</a>
+            </div>
+          </article>
+        )}
       </div>
 
-      <div class="editorial-grid">
-        {sortedNotes.map((item) => (
-          <ExecutionCard
-            href={`/notes/${item.slug}`}
-            title={item.data.title}
-            description={`Technical field notes and inquiries covering ${item.data.tags.join(', ')}.`}
-            date={item.data.date}
-            tags={item.data.tags}
-            category={item.data.category}
-            actionText="Read essay &rarr;"
-          />
-        ))}
+      <div class="notebook-footer">
+        <a href="/notes" class="archive-nav-link">Read all {allNotes.length} notes &rarr;</a>
       </div>
     </section>
 
     <hr class="hairline section-divider" />
 
-    <!-- 06 — CLOSING -->
-    <section class="closing-section">
-      <div class="closing-content">
-        <h2 class="closing-title">Inquiries &amp; Collaboration</h2>
-        <p class="prose closing-text">
-          I am always interested in discussing neuro-symbolic reasoning, formal verification in healthcare, 
-          low-level graphics programming, or academic research initiatives.
+    <!-- 05 — CLOSING INVITATION -->
+    <section class="closing-section" aria-labelledby="closing-heading">
+      <div class="closing-inner">
+        <h2 id="closing-heading" class="closing-title">Open to thoughtful conversations.</h2>
+        <p class="closing-lead">
+          I welcome discussions about research, software engineering, and collaborations where careful thinking can produce something useful.
         </p>
         <div class="closing-actions">
-          <button 
-            type="button" 
-            id="closing-contact-btn" 
+          <button
+            type="button"
+            id="closing-contact-btn"
             class="button primary"
             onclick="window.openContactModal && window.openContactModal()"
           >
@@ -176,6 +353,9 @@ const sortedNotes = [...allNotes].sort((a, b) => b.data.date.valueOf() - a.data.
           <a href="https://github.com/shagoto-sarkar" target="_blank" rel="noopener noreferrer" class="button">
             GitHub Profile
           </a>
+          <a href="/cv.pdf" class="button" download="Shagoto_Sarkar_CV.pdf">
+            Curriculum vitae
+          </a>
         </div>
       </div>
     </section>
@@ -183,139 +363,585 @@ const sortedNotes = [...allNotes].sort((a, b) => b.data.date.valueOf() - a.data.
 </BaseLayout>
 
 <style>
+  /* 01 — HERO SECTION */
   .hero-section {
-    padding-top: var(--space-8);
-    padding-bottom: var(--space-8);
+    padding-top: clamp(32px, 5vw, 64px);
+    padding-bottom: clamp(32px, 5vw, 64px);
   }
 
-  .hero-intro {
-    max-width: 860px;
+  .hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+  }
+
+  .hero-main {
+    max-width: 820px;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: var(--space-3);
   }
 
   .hero-heading {
-    font-size: 3rem;
+    font-size: clamp(2.5rem, 5.2vw, 4.2rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
     font-weight: 600;
-    line-height: 1.15;
-    margin-top: var(--space-3);
     margin-bottom: var(--space-6);
     color: var(--color-text-primary);
   }
 
   .hero-prose {
-    font-size: 1.25rem;
-    line-height: 1.7;
-    color: var(--color-text-secondary);
+    max-width: 640px;
     margin-bottom: var(--space-8);
   }
 
-  .hero-links {
+  .hero-lead {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.8vw, 1.15rem);
+    line-height: 1.65;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-sublead {
+    font-family: var(--font-sans);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .hero-actions {
     display: flex;
     gap: var(--space-3);
     flex-wrap: wrap;
+    align-items: center;
   }
 
+  /* HERO RAIL */
+  .hero-rail {
+    padding-top: var(--space-2);
+  }
+
+  .rail-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-subtle);
+    background-color: var(--color-bg-surface);
+    padding: var(--space-6);
+  }
+
+  .rail-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .rail-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+
+  .rail-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: 0;
+    margin: 0;
+  }
+
+  .rail-list li {
+    display: flex;
+    gap: var(--space-3);
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--color-text-primary);
+  }
+
+  .rail-num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .rail-divider {
+    height: 1px;
+    background-color: var(--color-border-subtle);
+    margin: var(--space-5) 0;
+  }
+
+  .rail-val {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  /* SECTION DIVIDER */
   .section-divider {
-    margin: var(--space-16) 0;
+    margin: clamp(48px, 6vw, 88px) 0;
   }
 
-  .focus-section {
-    padding: var(--space-4) 0;
+  /* SECTION INTRO */
+  .section-intro, .focus-header {
+    margin-bottom: var(--space-8);
   }
 
-  .focus-header {
+  .section-heading {
+    font-size: clamp(2.1rem, 3.8vw, 2.75rem);
+    font-weight: 600;
+    line-height: 1.15;
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .section-summary {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    max-width: 680px;
+  }
+
+  /* 02 — FEATURED RESEARCH PANEL */
+  .featured-research-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-subtle);
+    background-color: var(--color-bg-surface);
+    padding: clamp(24px, 4vw, 40px);
+    margin-bottom: var(--space-8);
+  }
+
+  .featured-research-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .panel-eyebrow {
+    margin-bottom: var(--space-3);
+  }
+
+  .featured-research-title {
+    font-size: clamp(1.8rem, 2.8vw, 2.3rem);
+    line-height: 1.2;
+    margin-bottom: var(--space-4);
+  }
+
+  .featured-research-title a {
+    color: var(--color-text-primary);
+  }
+
+  .featured-research-title a:hover {
+    color: var(--color-accent);
+  }
+
+  .featured-research-desc {
+    font-family: var(--font-sans);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: var(--color-text-secondary);
     margin-bottom: var(--space-6);
   }
 
-  .focus-title {
-    font-size: 1.6rem;
-    font-weight: 600;
+  .panel-meta-tags, .project-tech-strip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
   }
 
-  .focus-grid {
+  .meta-pill, .tech-tag {
+    color: var(--color-text-secondary);
+  }
+
+  .meta-sep, .tech-sep {
+    color: var(--color-border);
+  }
+
+  .panel-cta {
+    margin-top: auto;
+  }
+
+  .editorial-link {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color var(--motion-duration) ease;
+  }
+
+  .editorial-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* PIPELINE RAIL */
+  .featured-research-rail {
+    border-left: 1px solid var(--color-border-subtle);
+    padding-left: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .pipeline-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .pipeline-flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .pipeline-step {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-base);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-subtle);
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-accent);
+    margin-bottom: 2px;
+  }
+
+  .step-title {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .step-sub {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+
+  .pipeline-arrow {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  /* ENGINEERING SHOWCASE */
+  .engineering-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .projects-featured-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
     gap: var(--space-6);
   }
 
-  .focus-item {
-    background-color: var(--color-bg-surface);
+  .featured-project-card {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-subtle);
-    padding: var(--space-5);
+    background-color: var(--color-bg-surface);
+    padding: clamp(20px, 3vw, 32px);
+    display: flex;
+    flex-direction: column;
+    transition: border-color var(--motion-duration) ease;
   }
 
-  .focus-topic {
-    font-family: var(--font-editorial);
-    font-size: 1.25rem;
+  .featured-project-card:hover {
+    border-color: var(--color-text-secondary);
+  }
+
+  .project-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+  }
+
+  .project-eyebrow {
+    margin-bottom: 0;
+  }
+
+  .status-badge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-accent);
+    background-color: var(--color-accent-subtle);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .project-card-title {
+    font-size: clamp(1.6rem, 2.4vw, 2.05rem);
+    line-height: 1.22;
+    margin-bottom: var(--space-3);
+  }
+
+  .project-card-title a {
+    color: var(--color-text-primary);
+  }
+
+  .project-card-title a:hover {
+    color: var(--color-accent);
+  }
+
+  .project-card-desc {
+    font-family: var(--font-sans);
+    font-size: 0.94rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+    flex-grow: 1;
+  }
+
+  .project-card-action {
+    margin-top: auto;
+  }
+
+  /* SYSTEM COUNTERPOINT ROW */
+  .system-counterpoint-row {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-subtle);
+    background-color: var(--color-bg-surface);
+    padding: clamp(20px, 3vw, 28px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-6);
+    transition: border-color var(--motion-duration) ease;
+  }
+
+  .system-counterpoint-row:hover {
+    border-color: var(--color-text-secondary);
+  }
+
+  .counterpoint-main {
+    max-width: 720px;
+  }
+
+  .counterpoint-title {
+    font-size: clamp(1.4rem, 2vw, 1.7rem);
+    line-height: 1.25;
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .counterpoint-title a {
+    color: var(--color-text-primary);
+  }
+
+  .counterpoint-title a:hover {
+    color: var(--color-accent);
+  }
+
+  .counterpoint-desc {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+
+  .counterpoint-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-3);
+    flex-shrink: 0;
+  }
+
+  .counterpoint-aside .project-tech-strip {
+    margin-bottom: 0;
+  }
+
+  /* WORK FOOTER LINKS */
+  .work-footer-links, .notebook-footer {
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .archive-nav-link {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .archive-nav-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* 03 — CURRENT FOCUS RAIL */
+  .focus-section {
+    padding: var(--space-2) 0;
+  }
+
+  .focus-rail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(20px, 3vw, 36px);
+  }
+
+  .focus-statement {
+    display: flex;
+    gap: var(--space-4);
+    align-items: start;
+    border-left: 1px solid var(--color-border);
+    padding-left: var(--space-4);
+  }
+
+  .focus-num {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-top: 2px;
+  }
+
+  .focus-name {
+    font-size: 1.35rem;
     font-weight: 600;
     margin-bottom: var(--space-2);
     color: var(--color-text-primary);
   }
 
-  .focus-desc {
+  .focus-summary {
     font-family: var(--font-sans);
-    font-size: 0.875rem;
+    font-size: 0.88rem;
     line-height: 1.6;
     color: var(--color-text-secondary);
   }
 
-  .content-section {
-    padding: var(--space-4) 0;
-  }
-
-  .section-top {
+  /* 04 — NOTEBOOK ROWS */
+  .notebook-rows {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: var(--space-8);
-    flex-wrap: wrap;
-    gap: var(--space-4);
+    flex-direction: column;
+    margin-bottom: var(--space-6);
   }
 
-  .section-heading {
-    font-size: 2rem;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  .section-more-link {
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .section-more-link:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .editorial-grid {
+  .notebook-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 140px minmax(0, 1fr) 40px;
     gap: var(--space-6);
+    align-items: center;
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
-  .editorial-grid.three-col {
-    grid-template-columns: repeat(3, 1fr);
+  .notebook-row:first-child {
+    border-top: 1px solid var(--color-border);
   }
 
+  .notebook-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .notebook-category {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  .notebook-date {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .notebook-title {
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: var(--space-1);
+  }
+
+  .notebook-title a {
+    color: var(--color-text-primary);
+  }
+
+  .notebook-title a:hover {
+    color: var(--color-accent);
+  }
+
+  .notebook-desc {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+
+  .row-arrow {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    display: inline-flex;
+    justify-content: flex-end;
+    transition: color var(--motion-duration) ease, transform var(--motion-duration) ease;
+  }
+
+  .notebook-row:hover .row-arrow {
+    color: var(--color-accent);
+    transform: translateX(4px);
+  }
+
+  /* 05 — CLOSING SECTION */
   .closing-section {
-    padding: var(--space-6) 0 var(--space-12) 0;
+    padding: clamp(24px, 4vw, 48px) 0 clamp(48px, 6vw, 72px) 0;
   }
 
-  .closing-content {
+  .closing-inner {
     max-width: 680px;
   }
 
   .closing-title {
-    font-size: 2rem;
+    font-size: clamp(2rem, 3.5vw, 2.6rem);
+    font-weight: 600;
+    line-height: 1.2;
     margin-bottom: var(--space-3);
+    color: var(--color-text-primary);
   }
 
-  .closing-text {
-    font-size: 1.125rem;
+  .closing-lead {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    line-height: 1.65;
     color: var(--color-text-secondary);
     margin-bottom: var(--space-6);
   }
@@ -326,18 +952,56 @@ const sortedNotes = [...allNotes].sort((a, b) => b.data.date.valueOf() - a.data.
     flex-wrap: wrap;
   }
 
+  /* RESPONSIVE BREAKPOINTS */
   @media (max-width: 900px) {
-    .focus-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-4);
-    }
-
-    .editorial-grid, .editorial-grid.three-col {
+    .hero-layout {
       grid-template-columns: 1fr;
     }
 
-    .hero-heading {
-      font-size: 2.35rem;
+    .hero-rail {
+      max-width: 540px;
+    }
+
+    .featured-research-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .featured-research-rail {
+      border-left: none;
+      border-top: 1px solid var(--color-border-subtle);
+      padding-left: 0;
+      padding-top: var(--space-6);
+    }
+
+    .projects-featured-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .system-counterpoint-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .counterpoint-aside {
+      align-items: flex-start;
+    }
+
+    .focus-rail-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+
+    .focus-statement {
+      border-left: 2px solid var(--color-border);
+    }
+
+    .notebook-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+
+    .row-arrow {
+      display: none;
     }
   }
 </style>

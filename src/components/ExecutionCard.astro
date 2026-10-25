@@ -10,6 +10,7 @@ interface Props {
   isProposal?: boolean;
   category?: string;
   actionText?: string;
+  variant?: 'row' | 'card' | 'featured';
 }
 
 const {
@@ -22,169 +23,236 @@ const {
   status,
   isProposal,
   category,
-  actionText = "Read more →"
+  actionText = "Read more →",
+  variant = "row"
 } = Astro.props;
 
-const dateFormatted = date 
-  ? (typeof date === 'string' 
-      ? date 
+const dateFormatted = date
+  ? (typeof date === 'string'
+      ? date
       : new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short' }).format(date))
   : undefined;
+
+// Keep tag density controlled in archive rows
+const displayTags = tags.slice(0, 3);
 ---
 
-<article class="editorial-entry" data-category={category ? category.toLowerCase() : ''}>
-  <div class="entry-meta">
+<article
+  class={`editorial-entry variant-${variant}`}
+  data-category={category ? category.toLowerCase() : ''}
+>
+  <div class="entry-meta-col">
     {category && <span class="entry-category">{category}</span>}
-    {status && (
-      <span class="entry-status">
-        {isProposal ? 'Thesis Proposal' : status}
-      </span>
-    )}
-    {dateFormatted && <span class="entry-date">{dateFormatted}</span>}
+    {isProposal ? (
+      <span class="entry-status proposal-tag">Thesis Proposal</span>
+    ) : status ? (
+      <span class="entry-status">{status}</span>
+    ) : null}
+    {dateFormatted && <time class="entry-date">{dateFormatted}</time>}
   </div>
 
-  <h3 class="entry-title">
-    <a href={href}>{title}</a>
-  </h3>
+  <div class="entry-main-col">
+    <h3 class="entry-title">
+      <a href={href} class="entry-title-link">{title}</a>
+    </h3>
 
-  {subtitle && <p class="entry-subtitle">{subtitle}</p>}
+    {subtitle && <p class="entry-subtitle">{subtitle}</p>}
 
-  <p class="entry-desc">{description}</p>
+    <p class="entry-desc">{description}</p>
 
-  {tags.length > 0 && (
-    <div class="entry-tags">
-      {tags.map((tag) => (
-        <span class="entry-tag">{tag}</span>
-      ))}
-    </div>
-  )}
+    {displayTags.length > 0 && (
+      <div class="entry-tags" aria-label="Technologies">
+        {displayTags.map((tag) => (
+          <span class="entry-tag">{tag}</span>
+        ))}
+      </div>
+    )}
+  </div>
 
-  <div class="entry-action">
-    <a href={href} class="entry-link" tabindex="-1" aria-hidden="true">{actionText}</a>
+  <div class="entry-action-col">
+    <a href={href} class="entry-action-link" aria-label={`${actionText} about ${title}`}>
+      <span class="action-text">{actionText}</span>
+      <span class="action-arrow" aria-hidden="true">&rarr;</span>
+    </a>
   </div>
 </article>
 
 <style>
+  /* Base Row Variant (Quiet Precision Editorial Row) */
   .editorial-entry {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-6);
-    background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-subtle);
-    transition: border-color var(--motion-duration) ease, box-shadow var(--motion-duration) ease;
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr) 140px;
+    gap: var(--space-6);
+    align-items: start;
+    padding: clamp(20px, 3vw, 28px) 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+    background-color: transparent;
+    transition: background-color var(--motion-duration) ease;
   }
 
-  .editorial-entry:hover {
-    border-color: var(--color-text-secondary);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  .editorial-entry:first-child {
+    border-top: 1px solid var(--color-border);
   }
 
-  .editorial-entry:hover .entry-title a,
-  .editorial-entry:hover .entry-link {
+  .editorial-entry:hover .entry-title-link {
     color: var(--color-accent);
   }
 
-  .entry-title a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
+  .editorial-entry:hover .action-arrow {
+    transform: translateX(3px);
+    color: var(--color-accent);
   }
 
-  .entry-meta {
+  /* Left Metadata Column */
+  .entry-meta-col {
     display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-3);
+    flex-direction: column;
+    gap: 4px;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
+    font-size: 0.72rem;
   }
 
   .entry-category {
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 500;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--color-text-muted);
   }
 
   .entry-status {
     color: var(--color-accent);
+    font-size: 0.72rem;
+  }
+
+  .entry-status.proposal-tag {
+    font-weight: 500;
   }
 
   .entry-date {
-    margin-left: auto;
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+  }
+
+  /* Center Main Column */
+  .entry-main-col {
+    display: flex;
+    flex-direction: column;
   }
 
   .entry-title {
     font-family: var(--font-editorial);
-    font-size: 1.45rem;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
     font-weight: 600;
     line-height: 1.25;
     margin-bottom: var(--space-2);
     color: var(--color-text-primary);
   }
 
-  .entry-title a {
+  .entry-title-link {
     color: var(--color-text-primary);
     text-decoration: none;
-  }
-
-  .entry-title a:hover {
-    color: var(--color-accent);
+    transition: color var(--motion-duration) ease;
   }
 
   .entry-subtitle {
     font-family: var(--font-sans);
-    font-size: 0.8125rem;
+    font-size: 0.82rem;
     color: var(--color-text-muted);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
   }
 
   .entry-desc {
     font-family: var(--font-sans);
-    font-size: 0.9375rem;
+    font-size: 0.95rem;
     line-height: 1.6;
     color: var(--color-text-secondary);
-    margin-bottom: var(--space-4);
-    flex-grow: 1;
+    margin-bottom: var(--space-3);
   }
 
   .entry-tags {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-    margin-bottom: var(--space-4);
   }
 
   .entry-tag {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--color-text-muted);
     background-color: var(--color-bg-subtle);
-    padding: 1px 6px;
+    padding: 1px 7px;
     border-radius: var(--radius-subtle);
   }
 
-  .entry-action {
-    margin-top: auto;
-    padding-top: var(--space-2);
+  /* Right Action Column */
+  .entry-action-col {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding-top: 4px;
   }
 
-  .entry-link {
+  .entry-action-link {
     font-family: var(--font-sans);
-    font-size: 0.875rem;
+    font-size: 0.88rem;
     font-weight: 500;
     color: var(--color-accent);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
+    transition: color var(--motion-duration) ease;
   }
 
-  .entry-link:hover {
+  .entry-action-link:hover {
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  .action-arrow {
+    display: inline-block;
+    transition: transform var(--motion-duration) ease, color var(--motion-duration) ease;
+  }
+
+  /* Featured Variant */
+  .variant-featured {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-subtle);
+    padding: var(--space-6);
+    margin-bottom: var(--space-4);
+  }
+
+  /* Card Variant (Fallback / Boxed) */
+  .variant-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-6);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-subtle);
+    gap: var(--space-3);
+  }
+
+  /* Responsive Stacking */
+  @media (max-width: 840px) {
+    .editorial-entry {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+      padding: var(--space-5) 0;
+    }
+
+    .entry-meta-col {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+    }
+
+    .entry-action-col {
+      justify-content: flex-start;
+      padding-top: var(--space-1);
+    }
   }
 </style>

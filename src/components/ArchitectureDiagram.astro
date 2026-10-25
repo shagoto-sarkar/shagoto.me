@@ -79,17 +79,33 @@ const { title, ariaLabel, svgContent, caption, mermaidCode } = Astro.props;
   }
 
   .diagram-frame {
-    padding: var(--space-6);
+    padding: var(--space-4);
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     background-color: var(--color-bg-surface);
   }
 
   .diagram-frame :global(svg) {
-    max-width: 100%;
+    min-width: 520px;
+    width: 100%;
     height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 640px) {
+    .diagram-frame {
+      justify-content: center;
+      padding: var(--space-6);
+    }
+
+    .diagram-frame :global(svg) {
+      min-width: unset;
+      max-width: 100%;
+    }
   }
 
   .diagram-subtext {

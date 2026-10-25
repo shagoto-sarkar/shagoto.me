@@ -3,9 +3,16 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ExecutionCard from '../../components/ExecutionCard.astro';
 import { getCollection } from 'astro:content';
 
-const notesEntries = (await getCollection('notes')).sort(
+const allNotes = await getCollection('notes');
+const notesEntries = [...allNotes].sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
+
+const NOTE_DESCRIPTIONS: Record<string, string> = {
+  'headless-ubuntu-tailscale': 'Field notes on deploying and maintaining private headless Linux servers using WireGuard mesh topologies and automated systemd units.',
+  '8086-microprocessor-assembly': 'Low-level 8086 assembly implementations, register allocation tradeoffs, interrupt handling, and accumulator arithmetic routines.',
+  'moral-complexity-dostoevsky-arcane': 'A critical inquiry into systemic determinism, moral friction, and tragic necessity across classical Russian literature and contemporary narrative animation.'
+};
 
 const categories = [
   { id: 'all', label: 'All Notes', count: notesEntries.length },
@@ -15,183 +22,213 @@ const categories = [
 ];
 ---
 
-<BaseLayout 
-  title="Notes & Essays — Shagoto Sarkar"
+<BaseLayout
+  title="Notes & essays"
   description="Personal notebook, systems documentation, assembly solutions, and intellectual reflections by Shagoto Sarkar."
 >
   <div class="site-container">
-    <header class="page-intro">
-      <span class="eyebrow">Notebook &amp; Logs</span>
-      <h1 class="page-heading">Notes, Field Logs &amp; Essays</h1>
-      <p class="prose page-desc">
-        An intellectual notebook covering headless server administration, low-level microprocessor optimizations, 
-        and essays on moral complexity and technological determinism.
-      </p>
-      
-      <div class="category-pills" role="tablist" aria-label="Filter notes by category">
-        {categories.map(cat => (
-          <button 
-            type="button" 
-            class={`tag category-btn ${cat.id === 'all' ? 'accent active' : ''}`}
-            data-category={cat.id}
-            role="tab"
-            aria-selected={cat.id === 'all' ? 'true' : 'false'}
-          >
-            {cat.label} <span class="cat-count">({cat.count})</span>
-          </button>
-        ))}
+    <header class="archive-header">
+      <div class="header-main">
+        <span class="eyebrow">NOTEBOOK &amp; ESSAYS</span>
+        <h1 class="archive-heading">Notes &amp; essays</h1>
+        <p class="archive-desc">
+          An intellectual notebook covering headless server administration, low-level microprocessor optimizations, and essays on moral complexity and technological determinism.
+        </p>
+
+        <!-- Accessible Filter Toggle Buttons -->
+        <div class="category-filters" role="group" aria-label="Filter notes by topic">
+          {categories.map((cat) => (
+            <button
+              type="button"
+              class={`filter-btn ${cat.id === 'all' ? 'active' : ''}`}
+              data-category={cat.id}
+              aria-pressed={cat.id === 'all' ? 'true' : 'false'}
+            >
+              <span class="btn-label">{cat.label}</span>
+              <span class="btn-count">({cat.count})</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <span class="record-count">{notesEntries.length} entries</span>
       </div>
     </header>
 
-    <hr class="hairline page-divider" />
-
-    <div class="notes-list" id="notes-grid">
+    <div class="archive-rows-container" id="notes-container">
       {notesEntries.map((item) => (
         <ExecutionCard
           href={`/notes/${item.slug}`}
           title={item.data.title}
-          description={`Field notes and analysis covering ${item.data.tags.join(', ')}.`}
+          description={NOTE_DESCRIPTIONS[item.slug] || `Field notes and inquiries covering ${item.data.tags.join(', ')}.`}
           date={item.data.date}
           tags={item.data.tags}
           category={item.data.category}
-          actionText="Read entry &rarr;"
+          actionText="Read essay"
+          variant="row"
         />
       ))}
       <div id="notes-empty-state" class="notes-empty" style="display: none;">
-        No notes found under this category.
+        No notes found in this category.
       </div>
     </div>
   </div>
 
   <script is:inline>
     (function() {
-      const buttons = document.querySelectorAll('.category-btn');
-      const cards = document.querySelectorAll('#notes-grid .editorial-entry');
+      const buttons = document.querySelectorAll('.filter-btn');
+      const entries = document.querySelectorAll('#notes-container .editorial-entry');
       const emptyState = document.getElementById('notes-empty-state');
 
-      function applyFilter(category) {
-        let visibleCount = 0;
-        cards.forEach(card => {
-          const cardCat = card.getAttribute('data-category') || '';
-          const match = category === 'all' || cardCat === category;
-          if (match) {
-            card.style.display = 'flex';
-            visibleCount++;
+      function filterCategory(targetCat) {
+        let count = 0;
+        entries.forEach((entry) => {
+          const entryCat = entry.getAttribute('data-category') || '';
+          const matches = targetCat === 'all' || entryCat === targetCat;
+          if (matches) {
+            entry.style.display = 'grid';
+            count++;
           } else {
-            card.style.display = 'none';
+            entry.style.display = 'none';
           }
         });
 
-        buttons.forEach(btn => {
-          const isCurrent = btn.getAttribute('data-category') === category;
-          if (isCurrent) {
-            btn.classList.add('accent', 'active');
-            btn.setAttribute('aria-selected', 'true');
+        buttons.forEach((btn) => {
+          const isSelected = btn.getAttribute('data-category') === targetCat;
+          btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+          if (isSelected) {
+            btn.classList.add('active');
           } else {
-            btn.classList.remove('accent', 'active');
-            btn.setAttribute('aria-selected', 'false');
+            btn.classList.remove('active');
           }
         });
 
         if (emptyState) {
-          emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+          emptyState.style.display = count === 0 ? 'block' : 'none';
         }
       }
 
-      buttons.forEach(btn => {
+      buttons.forEach((btn) => {
         btn.addEventListener('click', () => {
           const cat = btn.getAttribute('data-category') || 'all';
-          applyFilter(cat);
-          const newHash = cat === 'all' ? '' : '#' + cat;
-          if (window.location.hash !== newHash) {
-            history.replaceState(null, '', newHash || window.location.pathname);
+          filterCategory(cat);
+          const hash = cat === 'all' ? '' : '#' + cat;
+          if (window.location.hash !== hash) {
+            history.replaceState(null, '', hash || window.location.pathname);
           }
         });
       });
 
-      const hash = window.location.hash.replace('#', '').toLowerCase();
-      if (hash && ['infrastructure', 'academia', 'philosophy'].includes(hash)) {
-        applyFilter(hash);
+      const initialHash = window.location.hash.replace('#', '').toLowerCase();
+      if (initialHash && ['infrastructure', 'academia', 'philosophy'].includes(initialHash)) {
+        filterCategory(initialHash);
       }
     })();
   </script>
 </BaseLayout>
 
 <style>
-  .page-intro {
-    padding-top: var(--space-4);
-    max-width: 820px;
-  }
-
-  .page-heading {
-    font-size: 2.75rem;
-    font-weight: 600;
-    margin-top: var(--space-2);
-    margin-bottom: var(--space-4);
-  }
-
-  .page-desc {
-    font-size: 1.1875rem;
-    color: var(--color-text-secondary);
-  }
-
-  .category-pills {
+  .archive-header {
     display: flex;
-    gap: var(--space-2);
-    margin-top: var(--space-6);
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-6);
+    padding-top: clamp(24px, 4vw, 48px);
+    margin-bottom: clamp(32px, 5vw, 56px);
     flex-wrap: wrap;
   }
 
-  .category-btn {
-    cursor: pointer;
-    background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
-    transition: all var(--motion-duration) ease;
-    font-size: 0.75rem;
+  .header-main {
+    max-width: 780px;
+  }
+
+  .archive-heading {
+    font-size: clamp(2.4rem, 4.4vw, 3.6rem);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .archive-desc {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.8vw, 1.15rem);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  .category-filters {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-subtle);
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--motion-duration) ease;
   }
 
-  .category-btn:hover {
+  .filter-btn:hover {
     border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
   }
 
-  .category-btn.active {
+  .filter-btn.active {
     border-color: var(--color-accent);
     color: var(--color-accent);
     background-color: var(--color-accent-subtle);
   }
 
-  .cat-count {
+  .btn-count {
     opacity: 0.75;
-    font-size: 0.6875rem;
+    font-size: 0.68rem;
   }
 
-  .page-divider {
-    margin: var(--space-10) 0;
+  .header-meta {
+    padding-bottom: var(--space-2);
   }
 
-  .notes-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-8);
+  .record-count {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    background-color: var(--color-bg-subtle);
+    padding: 3px 10px;
+    border-radius: var(--radius-subtle);
+    border: 1px solid var(--color-border);
+  }
+
+  .archive-rows-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: clamp(48px, 6vw, 88px);
   }
 
   .notes-empty {
-    padding: var(--space-8);
+    padding: var(--space-12) 0;
     text-align: center;
+    font-family: var(--font-sans);
     color: var(--color-text-muted);
-    font-size: 0.9375rem;
-    grid-column: 1 / -1;
+    font-size: 0.95rem;
   }
 
-  @media (max-width: 840px) {
-    .notes-list {
-      grid-template-columns: 1fr;
-    }
-    .page-heading {
-      font-size: 2.25rem;
+  @media (max-width: 640px) {
+    .archive-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-4);
     }
   }
 </style>

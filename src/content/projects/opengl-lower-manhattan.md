@@ -1,6 +1,6 @@
 ---
 title: "911 OpenGL Commemorative Simulation"
-constraint: "Strict deterministic real-time 60fps rendering of complex architectural structures without high-level scene graph abstractions, built directly in raw C++ and OpenGL."
+constraint: "Deterministic real-time 60fps rendering target of architectural structures without high-level scene graph abstractions, built directly in raw C++ and OpenGL."
 techStack: ["C++", "OpenGL", "GLSL", "GLFW"]
 date: 2024-09-11
 collaborators: ["Mahadi"]
@@ -12,11 +12,11 @@ repoUrl: "https://github.com/shagoto-sarkar/graphics_lab/tree/main/OpenGl_Projec
 
 ## The Constraint
 
-Modern 3D frameworks and game engines (Unreal, Unity, Three.js) abstract the raw graphics pipeline behind layers of garbage collection, heavy scene graphs, and non-deterministic memory allocators. 
+Modern 3D frameworks and game engines (Unreal, Unity, Three.js) abstract the raw graphics pipeline behind layers of garbage collection, heavy scene graphs, and non-deterministic memory allocators.
 
 For the **911 OpenGL Commemorative Simulation**, the architectural mandate was zero engine abstraction:
 * **Raw Hardware Interaction:** Direct calls to modern OpenGL state machine via GLFW windowing.
-* **Deterministic Frame Budgets:** Sustained 60 frames per second (16.6ms frame time budget) without micro-stutters or frame pacing jitter.
+* **Deterministic Frame Budgets:** Targeted 60 frames per second (16.6ms frame budget) on local Linux workstations without micro-stutters or frame pacing jitter.
 * **Mathematical Precision:** Manual computation of model-view-projection (MVP) transformation matrices for architectural geometry representing the Lower Manhattan skyline.
 
 ---
@@ -58,7 +58,9 @@ void render_skyline_frame(GLFWwindow* window, GLuint shaderProgram, GLuint vao, 
 }
 ```
 
-### Raw CLI Execution Output
+### Local Test Environment Execution Log
+
+*Recorded during local development benchmarking on Linux (Mesa / Intel/NVIDIA, VSync enabled):*
 
 ```text
 $ ./bin/skyline_sim --resolution 1920x1080 --vsync 1 --benchmark

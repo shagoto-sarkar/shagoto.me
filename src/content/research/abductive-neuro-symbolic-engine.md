@@ -81,9 +81,11 @@ def verify_clinical_safety(egfr_val: float, potassium_val: float, prescribing_sp
 
 ---
 
-## Proof & Verification Results
+## Formal Evaluation, Outcomes & Limitations
 
-By treating clinical safety as an automated theorem proving problem rather than next-token probability, the engine guarantees:
-* **Zero False Passes:** Unsound drug combinations that violate guideline constraints yield `UNSAT` with 100% mathematical certainty.
-* **Traceable Counterexamples:** When a regimen fails, Z3 produces unsat-core diagnostics identifying the exact conflicting premises (e.g., eGFR threshold vs. ACE-inhibitor combination).
-* **CLI-First Tooling:** Designed as a lightweight, headless UNIX CLI node operating locally without external cloud telemetry dependencies.
+By formulating safety boundaries as automated constraint satisfiability rather than next-token probability, the engine isolates semantic extraction from formal logic evaluation:
+
+- **Formal Constraint Satisfaction (`sat`):** When parameters satisfy all encoded rules, Z3 produces a satisfying assignment (`sat`). This indicates consistency with the formal axioms, not clinical efficacy or comprehensive patient safety.
+- **Deterministic Conflict Isolation (`unsat`):** When patient biomarkers and proposed prescriptions contradict formal guidelines, Z3 yields `unsat`. In conjunction with named assertions and unsat-core extraction, the engine isolates the specific conflicting guideline rule and biomarker premise.
+- **Undecidability & Solver Bounds (`unknown` / Timeout):** Where complex quantifier-free or non-linear theories exceed solver bounds, the engine flags an unverified (`unknown`) state, rejecting automatic approval and requiring manual physician review.
+- **Extraction Dependency Limitation:** The formal solver cannot correct subtle extraction errors made by the upstream LLM. If the language model hallucinates an inaccurate biomarker value (e.g., misreading 5.4 mEq/L as 4.5 mEq/L), the solver operates on false premises (garbage in, formal contradiction out). Pydantic boundary checks reduce out-of-range values but cannot guarantee clinical semantic fidelity without physician verification.

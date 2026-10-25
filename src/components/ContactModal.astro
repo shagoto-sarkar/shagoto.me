@@ -16,8 +16,8 @@
 
     <div class="contact-card-body">
       <div class="email-display-container">
-        <span class="email-label">Email Address:</span>
-        <div class="email-field" id="email-field-box" role="button" tabindex="0" title="Click to copy email address" aria-label="Copy email address to clipboard">
+        <label for="target-email" class="email-label">Email Address:</label>
+        <div class="email-field" id="email-field-box">
           <code class="email-text" id="target-email">shagotosarkar@gmail.com</code>
           <button type="button" id="copy-email-btn" class="button copy-btn" title="Copy to clipboard" aria-label="Copy email address">
             <span id="copy-btn-label">Copy</span>
@@ -27,9 +27,9 @@
       </div>
 
       <div class="contact-options-grid">
-        <a 
+        <a
           href="https://mail.google.com/mail/?view=cm&fs=1&to=shagotosarkar@gmail.com&su=Inquiry%20%E2%80%94%20Shagoto%20Sarkar"
-          target="_blank" 
+          target="_blank"
           rel="noopener noreferrer"
           class="button primary option-btn"
           id="web-gmail-btn"
@@ -41,8 +41,8 @@
           <span>Compose in Gmail (Web) &rarr;</span>
         </a>
 
-        <a 
-          href="mailto:shagotosarkar@gmail.com?subject=Inquiry%20%E2%80%94%20Shagoto%20Sarkar" 
+        <a
+          href="mailto:shagotosarkar@gmail.com?subject=Inquiry%20%E2%80%94%20Shagoto%20Sarkar"
           class="button option-btn fallback-btn"
         >
           <span>Open Default Mail Client</span>
@@ -315,10 +315,15 @@
         } catch (fallbackErr) {}
       }
 
-      if (copyLabel) copyLabel.textContent = '✓ Copied!';
-      if (copyBtn) copyBtn.style.borderColor = 'var(--color-accent)';
-      if (emailBox) emailBox.style.borderColor = 'var(--color-accent)';
-      if (liveStatus) liveStatus.textContent = 'Email address copied to clipboard.';
+      if (copied) {
+        if (copyLabel) copyLabel.textContent = '✓ Copied!';
+        if (copyBtn) copyBtn.style.borderColor = 'var(--color-accent)';
+        if (emailBox) emailBox.style.borderColor = 'var(--color-accent)';
+        if (liveStatus) liveStatus.textContent = 'Email address copied to clipboard.';
+      } else {
+        if (copyLabel) copyLabel.textContent = 'Copy failed';
+        if (liveStatus) liveStatus.textContent = 'Could not automatically copy email. Please select and copy manually.';
+      }
 
       copyTimeout = setTimeout(() => {
         if (copyLabel) copyLabel.textContent = 'Copy';
@@ -331,20 +336,8 @@
 
     if (copyBtn) {
       copyBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+        e.preventDefault();
         executeCopy();
-      });
-    }
-
-    if (emailBox) {
-      emailBox.addEventListener('click', () => {
-        executeCopy();
-      });
-      emailBox.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          executeCopy();
-        }
       });
     }
 

@@ -3,39 +3,44 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ExecutionCard from '../../components/ExecutionCard.astro';
 import { getCollection } from 'astro:content';
 
-const researchEntries = (await getCollection('research')).sort(
+const allResearch = await getCollection('research');
+const researchEntries = [...allResearch].sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 ---
 
-<BaseLayout 
-  title="Research — Formal Verification & Neuro-Symbolic AI"
-  description="Academic research, formal logic models, and undergraduate thesis proposals on embedding deterministic SMT constraints into probabilistic AI systems."
+<BaseLayout
+  title="Research & formal methods"
+  description="Academic research, formal verification models, and undergraduate thesis proposals on embedding deterministic SMT constraints into clinical reasoning systems."
 >
   <div class="site-container">
-    <header class="page-intro">
-      <span class="eyebrow">Academic Work</span>
-      <h1 class="page-heading">Research &amp; Formal Verification</h1>
-      <p class="prose page-desc">
-        Investigating methods to bridge probabilistic language models with deterministic automated theorem proving. 
-        Focus areas include medical guideline formalization, SMT constraint solving via Microsoft Z3, and eliminative abductive reasoning.
-      </p>
+    <header class="archive-header">
+      <div class="header-main">
+        <span class="eyebrow">ACADEMIC INVESTIGATION</span>
+        <h1 class="archive-heading">Research &amp; formal methods</h1>
+        <p class="archive-desc">
+          Undergraduate research exploring the integration of probabilistic language models with deterministic automated theorem proving (Z3 SMT solver) for clinical polypharmacy verification.
+        </p>
+      </div>
+      <div class="header-meta">
+        <span class="record-count">{researchEntries.length} investigations</span>
+      </div>
     </header>
 
-    <hr class="hairline page-divider" />
-
-    <div class="research-list">
+    <div class="archive-rows-container">
       {researchEntries.map((item) => (
         <ExecutionCard
           href={`/research/${item.slug}`}
           title={item.data.title}
-          subtitle={item.data.supervisor ? `Supervised by: ${item.data.supervisor}` : undefined}
+          subtitle={item.data.supervisor ? `Academic supervision: ${item.data.supervisor}` : undefined}
           description={item.data.abstract}
           date={item.data.date}
           tags={item.data.tags}
           status={item.data.status}
           isProposal={item.data.isProposal}
-          actionText="Read research paper brief &rarr;"
+          category="Research"
+          actionText="Read research brief"
+          variant="row"
         />
       ))}
     </div>
@@ -43,39 +48,60 @@ const researchEntries = (await getCollection('research')).sort(
 </BaseLayout>
 
 <style>
-  .page-intro {
-    padding-top: var(--space-4);
-    max-width: 820px;
+  .archive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-6);
+    padding-top: clamp(24px, 4vw, 48px);
+    margin-bottom: clamp(32px, 5vw, 56px);
+    flex-wrap: wrap;
   }
 
-  .page-heading {
-    font-size: 2.75rem;
+  .header-main {
+    max-width: 780px;
+  }
+
+  .archive-heading {
+    font-size: clamp(2.4rem, 4.4vw, 3.6rem);
     font-weight: 600;
+    line-height: 1.1;
     margin-top: var(--space-2);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-3);
   }
 
-  .page-desc {
-    font-size: 1.1875rem;
+  .archive-desc {
+    font-family: var(--font-sans);
+    font-size: clamp(1.05rem, 1.8vw, 1.15rem);
+    line-height: 1.6;
     color: var(--color-text-secondary);
   }
 
-  .page-divider {
-    margin: var(--space-10) 0;
+  .header-meta {
+    padding-bottom: var(--space-2);
   }
 
-  .research-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-8);
+  .record-count {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    background-color: var(--color-bg-subtle);
+    padding: 3px 10px;
+    border-radius: var(--radius-subtle);
+    border: 1px solid var(--color-border);
   }
 
-  @media (max-width: 840px) {
-    .research-list {
-      grid-template-columns: 1fr;
-    }
-    .page-heading {
-      font-size: 2.25rem;
+  .archive-rows-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: clamp(48px, 6vw, 88px);
+  }
+
+  @media (max-width: 640px) {
+    .archive-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-4);
     }
   }
 </style>

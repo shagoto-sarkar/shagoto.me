@@ -9,13 +9,13 @@ tags: ["Linux", "Ubuntu Server", "Tailscale", "WireGuard", "SSH", "systemd"]
 
 A headless Unix server is an exercise in computational minimalism. Eliminating display servers (X11/Wayland), desktop environments, and background telemetry liberates raw hardware cycles for compute workloads and continuous daemon operations.
 
-In this setup, a dedicated bare-metal machine running **Ubuntu Server 24.04 LTS** is orchestrated entirely through cryptographic terminal channels.
+In this homelab setup, a dedicated bare-metal machine running **Ubuntu Server 24.04 LTS** is orchestrated entirely through cryptographic terminal channels.
 
 ---
 
 ## Zero-Trust Tailscale WireGuard Mesh
 
-Traditional remote access relying on dynamic DNS and forwarded router ports (e.g. port 22 exposed to the public internet) invites automated brute-force attacks. 
+Traditional remote access relying on dynamic DNS and forwarded router ports (e.g. port 22 exposed to the public internet) invites automated brute-force attacks.
 
 Instead, the node is integrated into a private **Tailscale overlay mesh** powered by the WireGuard protocol:
 * **No Open Firewall Ports:** Inbound firewall rules drop all unauthenticated WAN packets.
@@ -64,7 +64,9 @@ RestartSec=5s
 WantedBy=default.target
 ```
 
-### Verification & Telemetry
+### Service Verification
+
+*Representative systemd service status on personal homelab node:*
 
 ```text
 $ ssh s_goto@node-ubuntu -p 2222 "systemctl --user status aria2"

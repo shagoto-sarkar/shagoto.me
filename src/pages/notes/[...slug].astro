@@ -139,6 +139,8 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
 
   .breadcrumb-link {
     color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--motion-duration) ease;
   }
 
   .breadcrumb-link:hover {
@@ -147,6 +149,14 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
 
   .breadcrumb-separator {
     color: var(--color-border);
+  }
+
+  .breadcrumb-current {
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
   }
 
   .note-header {
@@ -162,7 +172,7 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
   }
 
   .note-date {
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
     font-size: 0.8125rem;
     color: var(--color-text-muted);
   }
@@ -179,17 +189,20 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
   }
 
   .note-title {
-    font-size: 2.75rem;
+    font-family: var(--font-editorial);
+    font-size: clamp(2.1rem, 4vw, 2.75rem);
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.15;
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
+    letter-spacing: -0.01em;
   }
 
   .note-tags {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+    margin-top: var(--space-4);
   }
 
   .note-diagram {
@@ -203,8 +216,10 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
   }
 
   @media (max-width: 640px) {
-    .note-title {
-      font-size: 2.15rem;
+    .note-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
     }
   }
 </style>

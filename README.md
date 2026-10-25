@@ -6,6 +6,15 @@ Personal academic and systems engineering publication of Shagoto Sarkar.
 - **Pages Origin:** [https://shagoto-me.pages.dev](https://shagoto-me.pages.dev)
 - **Architecture Guide:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
 - **AI Agent Routing Guide:** [`AGENTS.md`](AGENTS.md)
+- **Documentation Suite:**
+  - [Design System (`docs/DESIGN_SYSTEM.md`)](docs/DESIGN_SYSTEM.md)
+  - [Content Authoring Guide (`docs/CONTENT_GUIDE.md`)](docs/CONTENT_GUIDE.md)
+  - [Local Development Guide (`docs/DEVELOPMENT.md`)](docs/DEVELOPMENT.md)
+  - [Deployment & Edge Guide (`docs/DEPLOYMENT.md`)](docs/DEPLOYMENT.md)
+  - [Architecture Decision Records (`docs/DECISIONS.md`)](docs/DECISIONS.md)
+  - [Changelog (`docs/CHANGELOG.md`)](docs/CHANGELOG.md)
+  - [Upgrade Recovery State (`docs/upgrade/STATE.md`)](docs/upgrade/STATE.md)
+  - [QA & Verification Log (`docs/upgrade/QA_LOG.md`)](docs/upgrade/QA_LOG.md)
 
 ---
 
@@ -15,9 +24,9 @@ Personal academic and systems engineering publication of Shagoto Sarkar.
 | :--- | :--- | :--- |
 | **Static Generator** | Astro 5.4+ (`output: 'static'`) | Zero-JS client runtime, 100% pre-rendered static HTML |
 | **Type Safety** | TypeScript (strict) + Zod | Schema validation for markdown collections & build diagnostics |
-| **Design System** | Vanilla CSS (`AXIOM v2`) | Refined Technical Editorialism, semantic custom properties |
+| **Design System** | Vanilla CSS (`Quiet Precision`) | Warm archival / deep slate editorialism, semantic custom properties |
 | **Typography** | Self-hosted *EB Garamond* & *JetBrains Mono* | 52 local `.woff2` files served with immutable cache headers |
-| **Diagrams & Syntax** | Inline SVGs + Build-time Shiki | Zero client runtime overhead, accessible `aria-label` tags |
+| **Diagrams & Syntax** | Inline SVGs + Build-time Shiki | Dual themes (`github-light` / `github-dark-dimmed`), accessible `aria-label` tags |
 | **Hosting & Edge** | Cloudflare Pages + Anycast CDN | Global edge distribution, automated SSL, custom headers |
 
 ---
@@ -34,22 +43,30 @@ shagoto.me/
 │   │   ├── CommandPalette.astro   # Accessible fuzzy search modal (Cmd+K / Ctrl+K)
 │   │   ├── ContactModal.astro     # Contact dialog, 1-click clipboard copy & socials
 │   │   ├── DualPaneViewer.astro   # Scholarly viewer: abstract + Z3 SMT solver spec
-│   │   └── ExecutionCard.astro    # Editorial listing card for research, projects & notes
+│   │   └── ExecutionCard.astro    # Accessible editorial row for research, projects & notes
 │   ├── content/                   # Zod-validated Markdown collections
 │   │   ├── notes/                 # Field essays & systems notes (3 entries)
 │   │   ├── projects/              # Systems engineering case studies (7 entries)
 │   │   ├── research/              # Formal verification & neuro-symbolic papers (2 entries)
 │   │   └── config.ts              # Zod schema definitions for all content collections
 │   ├── layouts/
-│   │   └── BaseLayout.astro       # Root HTML shell, nav header, footer, SEO & JSON-LD
+│   │   └── BaseLayout.astro       # Root HTML shell, nav header, mobile drawer, footer, SEO & JSON-LD
 │   ├── pages/
 │   │   ├── 404.astro              # Custom 404 page (noindex, nofollow)
-│   │   ├── index.astro            # Editorial homepage & active investigation areas
+│   │   ├── index.astro            # Curated Quiet Precision homepage & active investigation areas
 │   │   ├── notes/                 # Notes archive index & dynamic [...slug].astro
 │   │   ├── projects/              # Projects archive index & dynamic [...slug].astro
 │   │   └── research/              # Research archive index & dynamic [...slug].astro
 │   └── styles/
-│       └── global.css             # AXIOM v2 CSS custom properties, resets & font definitions
+│       └── global.css             # Quiet Precision CSS custom properties, resets & font definitions
+├── docs/                          # Canonical project documentation suite
+│   ├── DESIGN_SYSTEM.md           # Tokens, typography scale, responsive breakpoints & components
+│   ├── CONTENT_GUIDE.md           # Frontmatter schemas, honesty standards & verification steps
+│   ├── DEVELOPMENT.md             # Workstation prerequisites, CLI commands & visual QA matrix
+│   ├── DEPLOYMENT.md              # Cloudflare Pages CI/CD overview & safety guardrails
+│   ├── DECISIONS.md               # Architectural Decision Records (ADRs 001–005)
+│   ├── CHANGELOG.md               # Chronological factual changes
+│   └── upgrade/                   # Durable resumption ledger (STATE.md & QA_LOG.md)
 ├── public/
 │   ├── fonts/                     # 52 self-hosted .woff2 font binaries
 │   ├── _headers                   # Cloudflare security headers & 1-year immutable caching
@@ -74,9 +91,9 @@ shagoto.me/
 
 1. **Content Definition & Validation:** Markdown files in `src/content/{research,projects,notes}` define frontmatter strictly typed by Zod schemas in `src/content/config.ts`.
 2. **Static Route Generation:** Dynamic pages (`src/pages/*/[...slug].astro`) execute `getStaticPaths()` using `getCollection()`, injecting content and resolving architecture SVGs from `src/assets/diagrams/`.
-3. **Syntax Highlighting & Formatting:** Shiki highlights code blocks during static generation with `github-dark-dimmed` theme; date formatting is localized via `Intl.DateTimeFormat`.
-4. **Layout & Editorial Shell:** `src/layouts/BaseLayout.astro` wraps all pages, injecting self-hosted font faces, canonical URL tags, Schema.org `Person` JSON-LD, global navigation, and the footer.
-5. **Client-Side Interactivity (Zero Frameworks):** Micro-interactions in `CommandPalette.astro` (fuzzy search filtering, keyboard shortcuts) and `ContactModal.astro` (clipboard copy, backdrop dismiss) operate with vanilla DOM event listeners.
+3. **Syntax Highlighting & Formatting:** Shiki highlights code blocks during static generation with dual themes (`github-light` / `github-dark-dimmed`); date formatting is localized via `Intl.DateTimeFormat`.
+4. **Layout & Editorial Shell:** `src/layouts/BaseLayout.astro` wraps all pages, injecting self-hosted font faces, canonical URL tags, Schema.org `Person` JSON-LD, responsive header navigation with mobile drawer, and the footer.
+5. **Client-Side Interactivity (Zero Frameworks):** Micro-interactions in `CommandPalette.astro` (fuzzy search filtering, keyboard shortcuts), `ContactModal.astro` (clipboard copy, backdrop dismiss), and `BaseLayout.astro` (mobile drawer toggle) operate with vanilla DOM event listeners.
 6. **Edge CDN Delivery:** The compiled `dist/` directory deploys to Cloudflare Pages, applying caching rules from `public/_headers` (1-year immutable for `/_astro/*` and `/fonts/*`).
 
 ---
@@ -101,10 +118,9 @@ npm run build
 
 # 6. Preview compiled production build locally
 npm run preview
-
-# 7. Manual deploy to Cloudflare Pages via Wrangler
-npm run deploy
 ```
+
+> **SAFETY NOTICE:** Manual terminal deployment (`npm run deploy`) or triggering production CI/CD builds is strictly prohibited during feature development without explicit client authorization.
 
 For complete technical specifications, see [`ARCHITECTURE.md`](ARCHITECTURE.md). For AI coding rules, see [`AGENTS.md`](AGENTS.md).
 ## Production CI/CD

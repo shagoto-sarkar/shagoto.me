@@ -10,7 +10,7 @@ repoUrl: "https://github.com/shagoto-sarkar/diu-shagoto-ide"
 
 ## The Constraint
 
-Browser-based programming environments typically rely on massive polyfills, external web assembly runtimes, or client-heavy npm modules (Babel, Acorn, Monaco). 
+Browser-based programming environments typically rely on massive polyfills, external web assembly runtimes, or client-heavy npm modules (Babel, Acorn, Monaco).
 
 The goal of **Diu Shagoto IDE** was to architect an in-browser educational compiler from scratch using pure, dependency-free JavaScript:
 * **Zero External Parsers:** Custom lexical tokenizer and recursive descent parser written in vanilla JS.
@@ -76,7 +76,9 @@ function tokenize(input) {
 }
 ```
 
-### Compiler CLI & Diagnostic Output
+### Educational Compiler Pipeline Demonstration
+
+*Illustrative diagnostic log of the compiler execution stages:*
 
 ```text
 $ diu-compiler run test_program.src

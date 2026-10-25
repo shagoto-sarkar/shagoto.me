@@ -6,7 +6,7 @@ date: 2026-10-25
 demoVideoAvailable: false
 ---
 
-> **System Endpoint:** [`https://serialnow.shagoto.me`](https://serialnow.shagoto.me) &bull; **Publisher:** S.goto Lab &bull; **Development Codename:** `phantom` &bull; **Visual Demeanor:** *Mineral Teal* &bull; **Brand Demeanor:** *"Clarity in the waiting."*
+> **Project Stage:** Phase 0 Architecture & Interactive Prototype &bull; **Development Codename:** `phantom` &bull; **Studio Research:** S.goto Lab &bull; **Interface Identity:** *Mineral Teal* &bull; **Core Tenet:** *"Clarity in the waiting."*
 
 ## The Constraint
 
@@ -18,13 +18,13 @@ Receptionists—frequently university students, medical apprentices, or junior c
 * **The Receptionist Cognitive Chokepoint:** Multi-step modal dialogues, redundant form validations, and complex dropdowns slow down physical intake. In a busy clinic, an interface that cannot outperform pen-and-paper in speed is discarded during peak hours.
 * **The Fallacy of Hallucinated Wait Countdowns:** Clinical encounter times exhibit high natural variance; a follow-up report review may conclude in two minutes, while an acute diagnostic workup requires thirty. Systems that display linear countdown clocks (*"Your turn in 14 minutes"*) fabricate false promises and aggravate waiting-room disputes when schedules shift.
 
-For **`SerialNow.`** (published by S.goto Lab under internal development codename `phantom`), the engineering mandate was to construct a deterministic, zero-friction queue arbitration engine designed around the receptionist's tactile speed, backed by an unauthenticated, zero-PII patient projection layer that provides truthful visibility without digital hurdles.
+For **`SerialNow.`** (investigated as an independent systems project at S.goto Lab), the engineering mandate was to construct a deterministic, zero-friction queue arbitration engine designed around the receptionist's tactile speed, backed by an unauthenticated, zero-PII patient projection layer that provides truthful visibility without digital hurdles.
 
 ---
 
 ## The Execution
 
-`SerialNow.` is architected as an edge-ready Single Page Application built on React 19 Strict Mode, strict TypeScript, and plain CSS, backed by an in-memory transactional reducer and designed for eventual persistence across Cloudflare Workers and Cloudflare D1.
+`SerialNow.` is architected as an interactive Single Page Application built on React 19 Strict Mode, strict TypeScript, and plain CSS, backed by an in-memory transactional reducer and designed for eventual persistence across Cloudflare Workers and Cloudflare D1.
 
 ### 1. Receptionist Operational Primacy (Model B Physical Calling)
 

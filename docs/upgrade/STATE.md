@@ -1,0 +1,72 @@
+# shagoto.me Upgrade — Recovery State
+
+- Directive: `shagoto-me-instruction-v2.md` (checkpoint revision 2026-10-25)
+- Status: `COMPLETE`
+- Last verified checkpoint: 100 (Final Handoff Delivered)
+- Current authorized window: Window D (Final Closeout) — COMPLETED
+- Current atomic unit: Final Handoff Report; state: COMPLETED
+- Repo/branch and starting uncommitted changes:
+  - Branch: `main`
+  - Uncommitted changes at start: None
+- Intended files:
+  - `src/content/research/*.md` (2 entries)
+  - `src/content/projects/*.md` (7 entries)
+  - `src/content/notes/*.md` (3 entries)
+  - `src/layouts/BaseLayout.astro`
+  - `docs/CHANGELOG.md`
+  - `docs/upgrade/QA_LOG.md`
+  - `docs/upgrade/STATE.md`
+- Expected verification:
+  - `npm run check` (PASS: 20 files, 0 errors, 0 warnings, 0 hints)
+  - `npm test` (PASS: 100% build + diagnostics + site assertions, 17 routes compiled)
+  - `git diff --check` (PASS: clean, code 0)
+  - Audit table in `docs/upgrade/QA_LOG.md` with all 12 slugs audited per §9
+- Rollback/recovery strategy:
+  - Revert individual content markdown edits if needed.
+- Files changed by this upgrade:
+  - `src/styles/global.css`
+  - `astro.config.mjs`
+  - `src/layouts/BaseLayout.astro`
+  - `src/components/ContactModal.astro`
+  - `src/components/CommandPalette.astro`
+  - `src/components/ExecutionCard.astro`
+  - `src/components/DualPaneViewer.astro`
+  - `src/components/ArchitectureDiagram.astro`
+  - `src/pages/index.astro`
+  - `src/pages/projects/index.astro`
+  - `src/pages/research/index.astro`
+  - `src/pages/notes/index.astro`
+  - `src/pages/projects/[...slug].astro`
+  - `src/pages/research/[...slug].astro`
+  - `src/pages/notes/[...slug].astro`
+  - `src/content/research/abductive-neuro-symbolic-engine.md`
+  - `src/content/research/z3-cardiorenal-thesis-proposal.md`
+  - `src/content/projects/serialnow-queue-system.md`
+  - `src/content/projects/cashapp-expense-governor.md`
+  - `src/content/projects/go-edge-router.md`
+  - `src/content/projects/log-cognitive-journal.md`
+  - `src/content/projects/opengl-lower-manhattan.md`
+  - `src/content/projects/js-mini-compiler-ide.md`
+  - `src/content/projects/java-ridesharing-gui.md`
+  - `src/content/notes/headless-ubuntu-tailscale.md`
+  - `src/content/notes/8086-microprocessor-assembly.md`
+  - `src/content/notes/moral-complexity-dostoevsky-arcane.md`
+  - `scripts/test_site.js`
+  - `docs/*`
+  - `README.md`, `ARCHITECTURE.md`, `AGENTS.md`
+- Last passing checks:
+  - `git diff --check`: PASS (clean, exit code 0)
+  - `npm run check`: PASS (20 files, 0 errors, 0 warnings, 0 hints)
+  - `npm test`: PASS (100% build + diagnostics + site assertions, 17 routes compiled)
+- Known failures or unavailable validations:
+  - None.
+- Completed work:
+  - Windows A (70%), B (80%), C (90%), and D (100%) fully completed and verified.
+- Incomplete/possibly interrupted files:
+  - None.
+- Documentation last reconciled:
+  - `docs/DESIGN_SYSTEM.md`, `docs/CONTENT_GUIDE.md`, `docs/DEVELOPMENT.md`, `docs/DEPLOYMENT.md`, `docs/DECISIONS.md`, `docs/CHANGELOG.md`, `docs/upgrade/QA_LOG.md`, `docs/upgrade/STATE.md`, `README.md`, `ARCHITECTURE.md`, `AGENTS.md`.
+- Next safe action:
+  - None. Final handoff delivered. User may review git diff and deploy at their discretion.
+- Awaiting user's fresh `proceed`: NO (All upgrade milestones and handoff complete)
+- Production pushed/deployed: NO (Preserved strict read-only safety invariant)
