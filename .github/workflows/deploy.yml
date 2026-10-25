@@ -74,17 +74,12 @@ jobs:
           echo "Artifacts verified (index.html present, $(find dist -type f | wc -l) files ready for deployment)."
 
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              echo "::error title=Missing Cloudflare Secret::CLOUDFLARE_API_TOKEN is not set in GitHub repository secrets! Please add it in Repository Settings -> Secrets and variables -> Actions to enable manual production releases."
-              exit 1
-            else
-              echo "::warning title=Deployment Skipped (Secret Missing)::CLOUDFLARE_API_TOKEN is not configured in GitHub repository secrets. Build and all 26 verification tests passed, but edge auto-deploy was skipped. Add CLOUDFLARE_API_TOKEN under Settings -> Secrets and variables -> Actions to enable automatic edge deployment on push."
-              exit 0
-            fi
+            echo "::error title=Missing Cloudflare Secret::CLOUDFLARE_API_TOKEN is not configured in GitHub repository secrets! Please add it under https://github.com/shagoto-sarkar/shagoto.me/settings/secrets/actions/new to enable production edge releases."
+            exit 1
           fi
 
           ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-1e8d24858eeea95aeceb71b98246481d}"
           export CLOUDFLARE_ACCOUNT_ID="$ACCOUNT_ID"
 
           echo "Deploying to Cloudflare Pages project 'shagoto-me'..."
-          npx wrangler pages deploy dist --project-name=shagoto-me --branch=main
+          npx wrangler pages deploy dist --project-name=shagoto-me --branch=main --commit-dirty=true
