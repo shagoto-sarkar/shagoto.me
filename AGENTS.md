@@ -11,14 +11,14 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
 
 | Domain / Task | Read & Modify First | Supporting Logic | Files to Ignore |
 | :--- | :--- | :--- | :--- |
-| **Research Publications & Theses** | [`src/content/research/*.md`](src/content/research/)<br>[`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/research/index.astro`](src/pages/research/index.astro) | `src/content/notes/*`<br>`public/fonts/*` |
-| **Project Portfolios & Architecture** | [`src/content/projects/*.md`](src/content/projects/)<br>[`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/projects/index.astro`](src/pages/projects/index.astro) | `src/content/notes/*`<br>`public/fonts/*` |
-| **Technical Notes & Essays** | [`src/content/notes/*.md`](src/content/notes/)<br>[`src/pages/notes/[...slug].astro`](src/pages/notes/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/notes/index.astro`](src/pages/notes/index.astro) | `src/content/research/*`<br>`public/fonts/*` |
-| **Homepage & Editorial Layout** | [`src/pages/index.astro`](src/pages/index.astro)<br>[`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | [`src/styles/global.css`](src/styles/global.css)<br>[`src/components/Header.astro`](src/components/Header.astro) | `scripts/*`<br>`src/content/*` |
-| **Design System & Global Styling** | [`src/styles/global.css`](src/styles/global.css)<br>[`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | Scoped `<style>` blocks in `src/pages/*` | `scripts/*`<br>`public/*` |
-| **Interactive Components (Palette, Modal)**| [`src/components/CommandPalette.astro`](src/components/CommandPalette.astro)<br>[`src/components/ContactModal.astro`](src/components/ContactModal.astro) | [`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | `src/content/*`<br>`public/fonts/*` |
-| **Architecture Diagrams & SVGs** | [`src/assets/diagrams/*.svg`](src/assets/diagrams/)<br>[`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) | [`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro) | `src/components/*`<br>`public/fonts/*` |
-| **SEO, Headers & Edge Config** | [`astro.config.mjs`](astro.config.mjs)<br>[`public/_headers`](public/_headers)<br>[`public/robots.txt`](public/robots.txt)<br>[`wrangler.jsonc`](wrangler.jsonc) | [`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | `src/content/*`<br>`src/components/*` |
+| **Research Publications & Theses** | [`src/content/research/*.md`](src/content/research/)<br>[`src/pages/research/[...slug].astro`](src/pages/research/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/research/index.astro`](src/pages/research/index.astro)<br>[`src/components/DualPaneViewer.astro`](src/components/DualPaneViewer.astro) | `src/content/notes/*`<br>`src/content/projects/*`<br>`public/fonts/*` |
+| **Project Portfolios & Architecture** | [`src/content/projects/*.md`](src/content/projects/)<br>[`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/projects/index.astro`](src/pages/projects/index.astro)<br>[`src/components/ArchitectureDiagram.astro`](src/components/ArchitectureDiagram.astro) | `src/content/notes/*`<br>`src/content/research/*`<br>`public/fonts/*` |
+| **Technical Notes & Essays** | [`src/content/notes/*.md`](src/content/notes/)<br>[`src/pages/notes/[...slug].astro`](src/pages/notes/[...slug].astro) | [`src/content/config.ts`](src/content/config.ts)<br>[`src/pages/notes/index.astro`](src/pages/notes/index.astro)<br>[`src/components/ArchitectureDiagram.astro`](src/components/ArchitectureDiagram.astro) | `src/content/research/*`<br>`src/content/projects/*`<br>`public/fonts/*` |
+| **Homepage & Editorial Layout** | [`src/pages/index.astro`](src/pages/index.astro)<br>[`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | [`src/styles/global.css`](src/styles/global.css)<br>[`src/components/ExecutionCard.astro`](src/components/ExecutionCard.astro) | `scripts/*`<br>`src/content/*`<br>`public/fonts/*` |
+| **Design System & Global Styling** | [`src/styles/global.css`](src/styles/global.css)<br>[`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | Scoped `<style>` blocks in `src/pages/*` & `src/components/*` | `scripts/*`<br>`public/*`<br>`src/content/*` |
+| **Interactive Components (Palette, Modal)**| [`src/components/CommandPalette.astro`](src/components/CommandPalette.astro)<br>[`src/components/ContactModal.astro`](src/components/ContactModal.astro) | [`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro)<br>[`src/styles/global.css`](src/styles/global.css) | `src/content/*`<br>`public/fonts/*` |
+| **Architecture Diagrams & SVGs** | [`src/assets/diagrams/*.svg`](src/assets/diagrams/)<br>[`scripts/generate_diagrams.js`](scripts/generate_diagrams.js) | [`src/components/ArchitectureDiagram.astro`](src/components/ArchitectureDiagram.astro)<br>[`src/pages/projects/[...slug].astro`](src/pages/projects/[...slug].astro) | `src/content/notes/*`<br>`public/fonts/*` |
+| **SEO, Headers & Edge Config** | [`astro.config.mjs`](astro.config.mjs)<br>[`public/_headers`](public/_headers)<br>[`public/robots.txt`](public/robots.txt)<br>[`wrangler.jsonc`](wrangler.jsonc) | [`src/layouts/BaseLayout.astro`](src/layouts/BaseLayout.astro) | `src/content/*`<br>`src/components/*`<br>`src/assets/*` |
 | **Verification Test Suite** | [`scripts/test_site.js`](scripts/test_site.js) | `package.json` | `public/fonts/*`<br>`src/assets/*` |
 
 ---
@@ -26,11 +26,11 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
 ## 2. Invariant Codebase Conventions
 
 ### 2.1 Zero Client UI Frameworks
-- **No React, Vue, Svelte, Solid, or Tailwind:** All components must be written as native Astro templates (`.astro`) with scoped `<style>` blocks or styles in [`src/styles/global.css`](src/styles/global.css).
-- **Vanilla DOM Interactivity:** Any dynamic behavior (such as the Command Palette or Contact Modal) must be authored in lightweight vanilla TypeScript/JavaScript within `<script>` tags.
+- **No React, Vue, Svelte, Solid, or Tailwind:** All components must be authored as native Astro templates (`.astro`) with scoped `<style>` blocks or global styles in [`src/styles/global.css`](src/styles/global.css).
+- **Vanilla DOM Interactivity:** Any dynamic behaviors (such as the Command Palette fuzzy search or Contact Modal clipboard copy) must be authored in lightweight vanilla TypeScript/JavaScript within `<script>` tags.
 
 ### 2.2 Refined Technical Editorialism
-- **Prohibited Gimmicks:** Never introduce blinking cursors (`terminal-cursor`), matrix rain, fake terminal status lines (`cat /proc/self/status`), or simulated typewriter effects.
+- **Prohibited Gimmicks:** Never introduce blinking cursors (`terminal-cursor`), matrix rain, fake terminal status lines (`cat /proc/self/status`), `// AXIOM NODE`, or simulated typewriter effects.
 - **Tone & Typography:** Formal, intellectual, calm, restrained. Use *EB Garamond* for editorial reading prose and *JetBrains Mono* for code/metadata.
 
 ### 2.3 Test-Critical DOM Hooks & Exact Strings
@@ -38,9 +38,9 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
 - **Homepage Titles & Headings:**
   - `Architecting verifiable intelligence`
   - `Daffodil International University`
-  - `Active Areas of Investigation`
-  - `Selected Research`
-  - `Selected Systems & Projects`
+  - `Active Areas of Investigation` (with `Neuro-Symbolic Reasoning`)
+  - `Selected Research` (with `Abductive Neuro-Symbolic Engine`)
+  - `Selected Systems & Projects` (with `911 OpenGL Commemorative Simulation`)
   - `Recent Notes & Essays`
 - **DOM IDs & Classes:**
   - `#cmd-palette-backdrop`, `#contact-modal-backdrop`, `#copy-email-btn`, `#footer-contact-link`
@@ -51,7 +51,13 @@ When assigned a task in a specific domain, read and edit **ONLY** the designated
   - `https://www.instagram.com/shagotosarkar/` (`ig: @shagotosarkar`)
   - `https://www.facebook.com/shagoto.sarkar666` (`fb: /shagoto`)
   - `https://linkedin.com/in/shagoto-sarkar`
-- **SVG Diagrams:** Must be rendered inline as `<svg ... aria-label="...">`.
+- **Research & Thesis Requirements:**
+  - `scholarly-viewer` and `SMT-LIB2 Solver Specification` in neuro-symbolic research brief
+  - `Academic Proposal Notice` and `Assistant Professor` in thesis proposal
+- **SVG Diagrams & Highlights:**
+  - Must be rendered inline as `<svg ... aria-label="...">`
+  - OpenGL simulation credits `Mahadi` and links to `https://github.com/shagoto-sarkar/graphics_lab/tree/main/OpenGl_Project/911_v2`
+  - Build-time Shiki code blocks must contain `astro-code` and `render_skyline_frame`
 
 ### 2.4 Content Collections & Zod Invariants
 - **Schema Validation:** Every `.md` file in [`src/content/`](src/content/) must strictly satisfy the Zod schemas in [`src/content/config.ts`](src/content/config.ts).

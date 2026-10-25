@@ -8,10 +8,10 @@ const notesEntries = (await getCollection('notes')).sort(
 );
 
 const categories = [
-  { id: 'all', label: 'All Notes' },
-  { id: 'infrastructure', label: 'Infrastructure' },
-  { id: 'academia', label: 'Academia' },
-  { id: 'philosophy', label: 'Philosophy' }
+  { id: 'all', label: 'All Notes', count: notesEntries.length },
+  { id: 'infrastructure', label: 'Infrastructure', count: notesEntries.filter(n => n.data.category?.toLowerCase() === 'infrastructure').length },
+  { id: 'academia', label: 'Academia', count: notesEntries.filter(n => n.data.category?.toLowerCase() === 'academia').length },
+  { id: 'philosophy', label: 'Philosophy', count: notesEntries.filter(n => n.data.category?.toLowerCase() === 'philosophy').length }
 ];
 ---
 
@@ -28,18 +28,24 @@ const categories = [
         and essays on moral complexity and technological determinism.
       </p>
       
-      <div class="category-pills">
+      <div class="category-pills" role="tablist" aria-label="Filter notes by category">
         {categories.map(cat => (
-          <span class={`tag ${cat.id === 'all' ? 'accent' : ''}`}>
-            {cat.label}
-          </span>
+          <button 
+            type="button" 
+            class={`tag category-btn ${cat.id === 'all' ? 'accent active' : ''}`}
+            data-category={cat.id}
+            role="tab"
+            aria-selected={cat.id === 'all' ? 'true' : 'false'}
+          >
+            {cat.label} <span class="cat-count">({cat.count})</span>
+          </button>
         ))}
       </div>
     </header>
 
     <hr class="hairline page-divider" />
 
-    <div class="notes-list">
+    <div class="notes-list" id="notes-grid">
       {notesEntries.map((item) => (
         <ExecutionCard
           href={`/notes/${item.slug}`}
@@ -51,8 +57,64 @@ const categories = [
           actionText="Read entry &rarr;"
         />
       ))}
+      <div id="notes-empty-state" class="notes-empty" style="display: none;">
+        No notes found under this category.
+      </div>
     </div>
   </div>
+
+  <script is:inline>
+    (function() {
+      const buttons = document.querySelectorAll('.category-btn');
+      const cards = document.querySelectorAll('#notes-grid .editorial-entry');
+      const emptyState = document.getElementById('notes-empty-state');
+
+      function applyFilter(category) {
+        let visibleCount = 0;
+        cards.forEach(card => {
+          const cardCat = card.getAttribute('data-category') || '';
+          const match = category === 'all' || cardCat === category;
+          if (match) {
+            card.style.display = 'flex';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        buttons.forEach(btn => {
+          const isCurrent = btn.getAttribute('data-category') === category;
+          if (isCurrent) {
+            btn.classList.add('accent', 'active');
+            btn.setAttribute('aria-selected', 'true');
+          } else {
+            btn.classList.remove('accent', 'active');
+            btn.setAttribute('aria-selected', 'false');
+          }
+        });
+
+        if (emptyState) {
+          emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+      }
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cat = btn.getAttribute('data-category') || 'all';
+          applyFilter(cat);
+          const newHash = cat === 'all' ? '' : '#' + cat;
+          if (window.location.hash !== newHash) {
+            history.replaceState(null, '', newHash || window.location.pathname);
+          }
+        });
+      });
+
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      if (hash && ['infrastructure', 'academia', 'philosophy'].includes(hash)) {
+        applyFilter(hash);
+      }
+    })();
+  </script>
 </BaseLayout>
 
 <style>
@@ -80,6 +142,32 @@ const categories = [
     flex-wrap: wrap;
   }
 
+  .category-btn {
+    cursor: pointer;
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    transition: all var(--motion-duration) ease;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .category-btn:hover {
+    border-color: var(--color-text-secondary);
+  }
+
+  .category-btn.active {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-accent-subtle);
+  }
+
+  .cat-count {
+    opacity: 0.75;
+    font-size: 0.6875rem;
+  }
+
   .page-divider {
     margin: var(--space-10) 0;
   }
@@ -88,6 +176,14 @@ const categories = [
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-8);
+  }
+
+  .notes-empty {
+    padding: var(--space-8);
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    grid-column: 1 / -1;
   }
 
   @media (max-width: 840px) {

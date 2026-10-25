@@ -6,42 +6,44 @@ date: 2026-10-25
 demoVideoAvailable: false
 ---
 
-> **System Endpoint:** [`https://serialnow.shagoto.me`](https://serialnow.shagoto.me) &bull; **Publisher:** S.goto Lab &bull; **Development Codename:** `phantom` &bull; **Philosophy:** *"Clarity in the waiting."*
+> **System Endpoint:** [`https://serialnow.shagoto.me`](https://serialnow.shagoto.me) &bull; **Publisher:** S.goto Lab &bull; **Development Codename:** `phantom` &bull; **Visual Demeanor:** *Mineral Teal* &bull; **Brand Demeanor:** *"Clarity in the waiting."*
 
 ## The Constraint
 
-In outpatient medical chambers throughout Bangladesh, single-doctor practices operate under extreme queue pressure. Receptionists—often educated assistants or medical apprentices of the consulting physician—face continuous, repetitive interruptions from anxious patients (*"Koto serial cholche?"*, *"Ami kokhon jabo?"*). Meanwhile, crowded waiting rooms foster suspicion of queue jumping and arbitrary delays.
+In outpatient medical chambers throughout Bangladesh, single-doctor practices operate under extreme physical queue pressure. A single physician typically evaluates 50 to 60 patients during an evening session across two divergent clinical modalities: new primary diagnostic consultations and follow-up reviews of diagnostic pathology or imaging reports.
 
-Conventional healthcare management and hospital ERP platforms fail in this operational reality because they impose high technological barriers on vulnerable end users:
-* **Digital Compulsion Anti-Pattern:** Forcing sick, elderly, or tech-averse patients to install mobile applications, register accounts, or scan smartphone QR codes merely to be seen creates severe adoption failure.
-* **Receptionist Friction:** Complex administrative forms with redundant dropdowns slow down physical intake, causing receptionists to abandon software during peak hours.
-* **Opaque Hallucinated ETAs:** Estimating appointment arrival times with simplistic countdown timers damages patient trust when complex clinical consultations naturally deviate from schedule.
+Receptionists—frequently university students or medical apprentices of the consulting physician—serve as the sole operational buffer between an anxious waiting room and the consultation door. They face continuous, high-stress interruptions (*"Koto serial cholche?"*, *"Ami kokhon jabo?"*). Under this strain, traditional healthcare IT solutions and hospital ERP platforms suffer immediate operational rejection:
 
-For **`SerialNow.`** (published by S.goto Lab, developed under internal codename `phantom`), the mandate was to design an uncompromising, deterministic queue arbitration engine centered entirely around the receptionist's daily operational efficiency while providing patients with dignified, zero-friction queue transparency.
+* **The Digital Compulsion Anti-Pattern:** Demanding that sick, elderly, or tech-averse patients download mobile applications, create user accounts, or verify SMS OTPs to secure a place in line introduces friction that halts clinic operations.
+* **The Receptionist Cognitive Chokepoint:** Multi-step modal dialogues, redundant form validations, and complex dropdowns slow down physical intake. In a busy clinic, an interface that cannot outperform pen-and-paper in speed is discarded during peak hours.
+* **The Fallacy of Hallucinated Wait Countdowns:** Clinical encounter times exhibit high natural variance; a follow-up report review may conclude in two minutes, while an acute diagnostic workup requires thirty. Systems that display linear countdown clocks (*"Your turn in 14 minutes"*) fabricate false promises and aggravate waiting-room disputes when schedules shift.
+
+For **`SerialNow.`** (published by S.goto Lab under internal development codename `phantom`), the engineering mandate was to construct a deterministic, zero-friction queue arbitration engine designed around the receptionist's tactile speed, backed by an unauthenticated, zero-PII patient projection layer that provides truthful visibility without digital hurdles.
 
 ---
 
 ## The Execution
 
-`SerialNow` is engineered as a zero-dependency, high-throughput coordination platform featuring an in-memory receptionist command cockpit coupled with a zero-PII read-only patient projection layer.
+`SerialNow.` is architected as an edge-ready Single Page Application built on React 19 Strict Mode, strict TypeScript, and plain CSS, backed by an in-memory transactional reducer and designed for eventual persistence across Cloudflare Workers and Cloudflare D1.
 
-### 1. Receptionist-First Operational Primacy (Model B Calling)
+### 1. Receptionist Operational Primacy (Model B Physical Calling)
 
-The receptionist is the critical operational actor and the primary adoption gate. `SerialNow` treats the desk interface as an ergonomic mission-control cockpit designed for rapid tactile execution:
-* **Sub-Second Core Operations:** Single-tap actions for `Complete & Next`, `Skip & Next`, `Recall`, `Complete only`, and `Skip only`.
-* **5-Second Safe Undo & Tap Debounce:** Erroneous button clicks or accidental double-taps are debounced in software, with a 5-second non-destructive `Undo` buffer allowing immediate operational correction without database corruption.
-* **Model B Physical Calling Guarantees:** A patient is **never** required to interact with an application, verify an SMS code, or check in digitally to be called. The absence of digital activity never disqualifies a patient; the doctor or receptionist physically calls the serial number in the waiting room.
-* **Chamber Floor Adoption Metric:** The benchmark for success is receptionist advocacy—whether an operator can confidently state: *"আমাদের চেম্বারে SerialNow ব্যবহার করি"* without feeling burdened by data entry.
+The receptionist is the primary operator and the decisive adoption gate. `SerialNow.` treats the front-desk interface as an ergonomic mission-control console engineered for rapid keyboard and touch execution:
+
+* **Sub-Second Core Operations:** Primary queue transitions execute through single-tap and hotkeyed actions: `Complete & Next`, `Skip & Next`, `Recall`, `Complete only`, and `Skip only`.
+* **5-Second Compensating Undo & Tap Guard:** Accidental double-clicks and misclicks are trapped by a debounce guard. A non-destructive 5-second `Undo` buffer allows operators to reverse accidental state changes immediately. Reversals do not erase historical events; they append linked compensating records to the audit stream.
+* **Model B Calling Semantics:** Patients are **never** required to interact with an application, verify an SMS token, or confirm arrival digitally. A booking is callable the moment it is entered. Digital silence never marks a patient absent or skips their place; the doctor or receptionist physically calls the ticket number in the waiting room.
+* **Desk Adoption Benchmark:** Design decisions are judged by whether an operator can state: *"আমাদের চেম্বারে SerialNow ব্যবহার করি"* without feeling slowed down by data entry.
 
 ### 2. Deterministic Dual-Lane Batch Rotation (A/B/X Engine)
 
-Outpatient clinics inherently balance two distinct clinical flows: new comprehensive diagnostic consultations and shorter follow-up report evaluations. `SerialNow` resolves this tension using a deterministic dual-lane batch engine:
+Outpatient clinics inherently balance two distinct clinical workflows. `SerialNow.` arbitrates this tension using a deterministic state machine:
 
-| Lane | Clinical Domain | Queue Mechanics |
+| Lane | Clinical Workflow | Operational Mechanism |
 | :--- | :--- | :--- |
-| **Lane A** | New / Primary Consultations | Initial in-depth diagnostic encounters requiring full consultation duration. |
-| **Lane B** | Report Reviews & Returns | Follow-up patients returning with diagnostic laboratory / imaging reports. |
-| **Lane X** | Emergency & Discretionary Triage | Elderly, acute, or doctor-interleaved cases served without corrupting A/B queue order. |
+| **Lane A** | Primary Consultations | Comprehensive diagnostic evaluations requiring standard consultation windows. |
+| **Lane B** | Report Reviews & Returns | Rapid evaluations of laboratory, pathology, or imaging reports ordered during earlier sessions. |
+| **Lane X** | Interleaved Exceptions | Discretionary triage, acute cases, or physician-directed out-of-order visits handled without corrupting A/B rotation. |
 
 ```
                        ┌─────────────────────────────────────┐
@@ -63,31 +65,64 @@ Outpatient clinics inherently balance two distinct clinical flows: new comprehen
                        └─────────────────────────────────────┘
 ```
 
-The system executes a configurable batch cadence (default: **5 completed A visits alternating with 5 completed B visits**). When switching between lanes, partial progress is strictly preserved. Rejoining a skipped serial restores the patient to their original lane's tail (with manual front override capabilities), maintaining absolute mathematical transparency.
+The rotation engine enforces strict mathematical invariants:
+* **Batch Quota Discipline:** The default rotation targets **5 completed A visits alternating with 5 completed B visits**. Crucially, a batch slot is consumed **only upon confirmed consultation completion**; calls, recalls, and skips do not advance the batch counter.
+* **Interruption Preservation:** If the physician requests report reviews while Lane A is at `3/5`, the operator switches to Lane B. Lane B completes its `5/5` quota, and when Lane A is re-selected, it resumes with exactly 2 consultations remaining. Progress is preserved independently across lanes.
+* **Lane X Interleaving:** Exceptional cases routed through Lane X temporarily pause the active batch without resetting either lane's progress counter. If an existing Lane A or B patient is served via Lane X, their original serial is preserved while their queue eligibility is retired, preventing duplicate consultations.
+* **Late-Patient Rejoin Placement:** When a skipped patient returns, they are appended behind all currently uncalled, eligible bookings in their **original category** at the timestamp of the rejoin transaction, with an optional receptionist front override.
 
 ### 3. Zero-PII Patient Transparency Projection (`/preview/patient`)
 
 Patients access an unauthenticated, read-only tracking view designed for low-end mobile devices and unstable cellular data:
-* **Zero PII Leakage:** The projection pipeline executes a strict server/model whitelist. Patient names, telephone numbers, clinical notes, and triage reasons are completely dropped before reaching the patient view.
-* **Uncalled Count Transparency:** Displays the exact count of uncalled bookings ahead within the patient's own lane and current batch progress, clearly distinguishing queue tickets from physical room attendance.
-* **Refusal to Hallucinate Waiting Times:** The interface explicitly communicates that waiting time is nondeterministic (*"অপেক্ষার সময় অপরিবর্তনীয়/অজানা"*), refusing to invent misleading countdown timers.
-* **Offline-Resilient Temporal Telemetry:** Offline, stale, and recovered states visibly display exact last-known synchronization timestamps (`Asia/Dhaka`), ensuring patients are never deceived by cached or interrupted data connections.
 
-### 4. Mineral Teal Visual Demeanor & Low-Fatigue Contrast
+* **Strict Whitelist Serialization:** The patient projection pipeline enforces a zero-PII whitelist. Patient names, telephone numbers, clinical notes, and exception reasons are dropped before the data leaves the projection layer.
+* **Uncalled Count vs. Physical Presence:** The interface displays the exact count of uncalled bookings ahead within the patient's own category, explicitly informing the user that this metric reflects registered bookings rather than physical waiting-room attendance.
+* **Anti-Hallucination Temporal Semantics:** The system explicitly displays that waiting time is nondeterministic (*"অপেক্ষার সময় অপরিবর্তনীয়/অজানা"*), refusing to generate speculative countdown clocks.
+* **Stale & Offline Telemetry:** Offline and stale states visibly display the exact verified synchronization timestamp (`Asia/Dhaka`). If the network disconnects, the interface indicates data staleness rather than displaying a false empty queue.
 
-Reflecting S.goto Lab's studio brand direction, the interface employs a **Mineral Teal** visual architecture:
-* **Calm & Restrained Palette:** Built on deep mineral teal foundations (`#142D35`), raised teal paneling (`#24454D`), and warm ivory typography (`#F7F6F2`), anchored by a signature **mint trailing dot** (`#85D6B7`) in the `SerialNow.` wordmark.
-* **Rejection of Clinical Clichés:** Eliminates jarring hospital-blue gradients, fake ECG heartlines, or decorative animations. The palette minimizes ocular fatigue during grueling 6-hour receptionist shifts and provides visual calm for distressed patients.
+### 4. Mineral Teal Demeanor & Low-Fatigue Contrast
 
-### 5. Accessibility & Quality-First Verification
+Reflecting S.goto Lab's studio brand direction, the visual architecture employs a **Mineral Teal** theme:
 
-The implementation follows a rigorous quality-first testing protocol:
-* **75 Unit & Domain Tests (Vitest):** Proves mathematical transition invariants across mock reducers, batch rotations, undo cascades, and projection whitelists.
-* **50 Full-Stack Browser Tests (Playwright):** Exercises complete patient and receptionist journeys against the production build on loopback `4173` across desktop, tablet, and mobile (360px, 768px, 1280px, 1440px) viewports with zero retries.
-* **Automated Axe Accessibility Scans:** Zero detected accessibility violations (`axe-core 4.14.0`) across all queue states, 200% reflow scaling, high-contrast states, and system Noto Sans Bengali fallbacks.
+* **Palette Foundations:** Built upon deep mineral teal (`#142D35`), raised surface cards (`#24454D`), warm ivory typography (`#F7F6F2`), and a signature **mint trailing dot** (`#85D6B7`) in the `SerialNow.` wordmark.
+* **Elimination of Healthcare Tropes:** Eliminates hospital-blue gradients, decorative ECG lines, and glossy animations. The restrained contrast ratio minimizes ocular fatigue over 6-hour shifts and offers visual calm for distressed patients.
+
+### 5. Quality-First Verification & Hardening
+
+The codebase enforces strict quality gates:
+
+* **75 Unit & Domain Tests (Vitest):** Validates deterministic state machine transitions, batch quota preservation across manual switches, undo chains, and projection whitelist drops.
+* **50 Full-Stack Browser Tests (Playwright):** Exercises complete receptionist and patient journeys on the built production bundle on loopback `4173` across desktop, tablet, and mobile (360px, 768px, 1280px, 1440px) viewports with zero retries.
+* **Automated Axe Accessibility Audits:** Zero detected violations (`axe-core 4.14.0`) across all queue states, 200% reflow scaling, high-contrast modes, and system Noto Sans Bengali typography.
 
 ---
 
-## Engineering Takeaways
+## Hard Engineering Decisions & Trade-Offs
 
-`SerialNow` demonstrates that technology in public healthcare settings succeeds through humility and operational alignment. By prioritizing the receptionist's physical workflow, eliminating digital barriers for sick patients, and implementing deterministic batch arbitration, the system proves that genuine clinical flow stability is achieved through strict domain constraints rather than surveillance or automated bureaucracy.
+### 1. In-Memory Reducer with Compensating Event Log vs. Naive State Rollback
+* **Context:** In a busy clinic, receptionists occasionally trigger `Complete & Next` or `Skip & Next` prematurely.
+* **Decision:** Rather than relying on destructive rollback operations that erase database history, `SerialNow.` pairs compound operations into atomic units and implements undo via compensating events.
+* **Trade-Off:** Requires maintaining an explicit dependency graph of recent actions. If dependent actions occur (e.g., another staff member registers a patient or advances the queue), blind rollback is blocked, and guided correction is offered instead. This guarantees historical audit integrity under future multi-operator concurrency.
+
+### 2. Model B Physical Calling vs. Model A Digital Arrival Verification
+* **Context:** Modern appointment platforms require patients to confirm arrival digitally via geolocation, QR scan, or SMS link.
+* **Decision:** `SerialNow.` implements Model B calling, where all uncalled registered bookings remain call-eligible by default. Absence of digital response has zero operational consequence.
+* **Trade-Off:** The system cannot guarantee that a called patient is physically seated in the waiting room. However, this mirrors real chamber operations: the receptionist physically announces the ticket number. If the patient is absent, the operator executes a single-tap `Skip`, preserving queue momentum without digital lockouts.
+
+### 3. Whitelist Projection Pipeline vs. Dynamic Query Filtering
+* **Context:** Patient tracking views must never expose identifying details of other patients or internal clinical annotations.
+* **Decision:** The system separates the operational domain model from the public projection model through a compile-time and runtime whitelist pipeline.
+* **Trade-Off:** Any new field intended for the patient view requires explicit whitelist registration. However, this architectural barrier eliminates accidental data exposure (such as internal triage notes or contact numbers) at the type system level.
+
+---
+
+## Engineering Takeaways & Invariants
+
+`SerialNow.` demonstrates that software deployed in high-stress public environments succeeds through operational humility and deterministic constraints:
+
+$$\text{Invariant 1 (Serial Stability)}: \quad S_{\text{orig}}(v) = \text{const} \quad \forall \text{ state transitions}$$
+$$\text{Invariant 2 (Batch Quota)}: \quad \Delta Q_{\text{lane}} = 1 \iff \text{transition}(v) = \text{COMPLETED}$$
+$$\text{Invariant 3 (Zero PII)}: \quad \text{fields}(\text{Projection}) \cap \{\text{Name}, \text{Phone}, \text{Notes}, \text{Reason}_X\} = \emptyset$$
+$$\text{Invariant 4 (Non-Punitive Silence)}: \quad \text{ping}(p) = \text{false} \centernot\implies \text{status}(v) = \text{SKIPPED}$$
+
+By prioritizing receptionist intake velocity, removing digital dependencies for sick patients, and enforcing mathematical batch arbitration, `SerialNow.` stabilizes outpatient flow without automated bureaucracy.

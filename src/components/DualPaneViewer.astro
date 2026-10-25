@@ -18,13 +18,13 @@ const {
     </div>
 
     <div class="viewer-tabs" role="tablist" aria-label="Research View Options">
-      <button type="button" class="viewer-tab active" data-view="split" id="btn-split" aria-pressed="true">
+      <button type="button" class="viewer-tab active" data-view="split" id="btn-split" role="tab" aria-selected="true" aria-controls="dual-pane-grid" aria-pressed="true">
         Side-by-Side
       </button>
-      <button type="button" class="viewer-tab" data-view="prose" id="btn-prose" aria-pressed="false">
+      <button type="button" class="viewer-tab" data-view="prose" id="btn-prose" role="tab" aria-selected="false" aria-controls="dual-pane-grid" aria-pressed="false">
         Methodology
       </button>
-      <button type="button" class="viewer-tab" data-view="proof" id="btn-proof" aria-pressed="false">
+      <button type="button" class="viewer-tab" data-view="proof" id="btn-proof" role="tab" aria-selected="false" aria-controls="dual-pane-grid" aria-pressed="false">
         Proofs &amp; Models
       </button>
     </div>
@@ -214,17 +214,34 @@ const {
         if (isCurrent) {
           tab.classList.add('active');
           tab.setAttribute('aria-pressed', 'true');
+          tab.setAttribute('aria-selected', 'true');
         } else {
           tab.classList.remove('active');
           tab.setAttribute('aria-pressed', 'false');
+          tab.setAttribute('aria-selected', 'false');
         }
       });
     }
 
-    tabs.forEach(tab => {
+    tabs.forEach((tab, idx) => {
       tab.addEventListener('click', () => {
         const mode = tab.getAttribute('data-view');
         if (mode) setView(mode);
+      });
+
+      tab.addEventListener('keydown', (e) => {
+        let targetIdx = null;
+        if (e.key === 'ArrowRight') {
+          targetIdx = (idx + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft') {
+          targetIdx = (idx - 1 + tabs.length) % tabs.length;
+        }
+        if (targetIdx !== null) {
+          e.preventDefault();
+          tabs[targetIdx].focus();
+          const mode = tabs[targetIdx].getAttribute('data-view');
+          if (mode) setView(mode);
+        }
       });
     });
   })();

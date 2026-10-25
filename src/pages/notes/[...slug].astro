@@ -7,18 +7,26 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export async function getStaticPaths() {
-  const notesEntries = await getCollection('notes');
-  return notesEntries.map((entry: CollectionEntry<'notes'>) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+  const notesEntries = (await getCollection('notes')).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  );
+  return notesEntries.map((entry: CollectionEntry<'notes'>, index: number) => {
+    const prevEntry = index < notesEntries.length - 1 ? notesEntries[index + 1] : null;
+    const nextEntry = index > 0 ? notesEntries[index - 1] : null;
+    return {
+      params: { slug: entry.slug },
+      props: { entry, prevEntry, nextEntry },
+    };
+  });
 }
 
 interface Props {
   entry: CollectionEntry<'notes'>;
+  prevEntry?: CollectionEntry<'notes'> | null;
+  nextEntry?: CollectionEntry<'notes'> | null;
 }
 
-const { entry } = Astro.props;
+const { entry, prevEntry, nextEntry } = Astro.props;
 const { Content } = await entry.render();
 
 let svgContent = '';
@@ -34,6 +42,10 @@ const dateFormatted = new Intl.DateTimeFormat('en-US', {
   month: 'long', 
   day: 'numeric' 
 }).format(entry.data.date);
+
+const words = entry.body.trim().split(/\s+/).length;
+const readTimeMinutes = Math.max(1, Math.round(words / 200));
+const readTime = `${readTimeMinutes} min read`;
 
 const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
 ---
@@ -53,7 +65,11 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
       <header class="note-header">
         <div class="note-meta">
           <span class="eyebrow">{entry.data.category}</span>
-          <time class="note-date">{dateFormatted}</time>
+          <div class="meta-right">
+            <time class="note-date">{dateFormatted}</time>
+            <span class="meta-sep">&bull;</span>
+            <span class="reading-time">{readTime}</span>
+          </div>
         </div>
 
         <h1 class="note-title">{entry.data.title}</h1>
@@ -81,6 +97,31 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
       <div class="note-body prose">
         <Content />
       </div>
+
+      <nav class="article-pagination" aria-label="Sequential Notes Navigation">
+        <div class="pagination-prev">
+          {prevEntry && (
+            <a href={`/notes/${prevEntry.slug}`} class="pagination-link prev">
+              <span class="pagination-direction">&larr; Older Note</span>
+              <span class="pagination-title">{prevEntry.data.title}</span>
+            </a>
+          )}
+        </div>
+        <div class="pagination-index">
+          <a href="/notes" class="pagination-link index">
+            <span class="pagination-direction">Directory</span>
+            <span class="pagination-title">All Notes</span>
+          </a>
+        </div>
+        <div class="pagination-next">
+          {nextEntry && (
+            <a href={`/notes/${nextEntry.slug}`} class="pagination-link next">
+              <span class="pagination-direction">Newer Note &rarr;</span>
+              <span class="pagination-title">{nextEntry.data.title}</span>
+            </a>
+          )}
+        </div>
+      </nav>
     </article>
   </div>
 </BaseLayout>
@@ -124,6 +165,17 @@ const metaDescription = `Field note by Shagoto Sarkar: ${entry.data.title}.`;
     font-family: var(--font-sans);
     font-size: 0.8125rem;
     color: var(--color-text-muted);
+  }
+
+  .meta-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .meta-sep {
+    color: var(--color-border);
+    font-size: 0.75rem;
   }
 
   .note-title {

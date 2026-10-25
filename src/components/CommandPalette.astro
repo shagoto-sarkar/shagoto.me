@@ -195,12 +195,24 @@
       );
     }
 
+    function setOutsideInert(isInert) {
+      const landmarks = document.querySelectorAll('.site-header, .site-main, .site-footer');
+      landmarks.forEach(el => {
+        if (isInert) {
+          el.setAttribute('inert', '');
+        } else {
+          el.removeAttribute('inert');
+        }
+      });
+    }
+
     function openPalette() {
       if (!backdrop || !input) return;
       previousActiveElement = document.activeElement;
       document.body.style.overflow = 'hidden';
       backdrop.style.display = 'flex';
       backdrop.setAttribute('aria-hidden', 'false');
+      setOutsideInert(true);
       input.value = '';
       filteredNodes = [...nodes];
       selectedIndex = 0;
@@ -213,6 +225,7 @@
       document.body.style.overflow = '';
       backdrop.style.display = 'none';
       backdrop.setAttribute('aria-hidden', 'true');
+      setOutsideInert(false);
       if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
         previousActiveElement.focus();
       }
@@ -224,10 +237,11 @@
 
       if (filteredNodes.length === 0) {
         const emptyState = document.createElement('div');
-        emptyState.style.padding = '16px 20px';
+        emptyState.style.padding = '20px 24px';
         emptyState.style.color = 'var(--color-text-muted)';
         emptyState.style.fontSize = '0.875rem';
-        emptyState.textContent = 'No matching pages found';
+        emptyState.style.lineHeight = '1.5';
+        emptyState.innerHTML = '<div>No matching entries found.</div><div style="font-size: 0.75rem; margin-top: 4px; color: var(--color-text-secondary);">Try searching for <em>z3</em>, <em>opengl</em>, <em>tailscale</em>, <em>compiler</em>, or <em>assembly</em>.</div>';
         resultsContainer.appendChild(emptyState);
         return;
       }
@@ -292,16 +306,15 @@
     }
 
     function handleFilter() {
-      const query = input.value.toLowerCase().trim();
-      if (!query) {
+      const raw = input.value.toLowerCase().trim();
+      if (!raw) {
         filteredNodes = [...nodes];
       } else {
-        filteredNodes = nodes.filter(n => 
-          n.title.toLowerCase().includes(query) || 
-          n.desc.toLowerCase().includes(query) ||
-          n.section.toLowerCase().includes(query) ||
-          n.path.toLowerCase().includes(query)
-        );
+        const terms = raw.split(/\s+/).filter(Boolean);
+        filteredNodes = nodes.filter(n => {
+          const haystack = `${n.title} ${n.desc} ${n.section} ${n.path}`.toLowerCase();
+          return terms.every(t => haystack.includes(t));
+        });
       }
       selectedIndex = 0;
       renderResults();
@@ -352,6 +365,22 @@
       backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) {
           closePalette();
+        }
+      });
+
+      backdrop.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          const focusables = [input, closeBtn].filter(Boolean);
+          if (focusables.length < 2) return;
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
         }
       });
     }

@@ -8,18 +8,26 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export async function getStaticPaths() {
-  const researchEntries = await getCollection('research');
-  return researchEntries.map((entry: CollectionEntry<'research'>) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+  const researchEntries = (await getCollection('research')).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  );
+  return researchEntries.map((entry: CollectionEntry<'research'>, index: number) => {
+    const prevEntry = index < researchEntries.length - 1 ? researchEntries[index + 1] : null;
+    const nextEntry = index > 0 ? researchEntries[index - 1] : null;
+    return {
+      params: { slug: entry.slug },
+      props: { entry, prevEntry, nextEntry },
+    };
+  });
 }
 
 interface Props {
   entry: CollectionEntry<'research'>;
+  prevEntry?: CollectionEntry<'research'> | null;
+  nextEntry?: CollectionEntry<'research'> | null;
 }
 
-const { entry } = Astro.props;
+const { entry, prevEntry, nextEntry } = Astro.props;
 const { Content } = await entry.render();
 
 const diagramId = entry.slug === 'abductive-neuro-symbolic-engine'
@@ -36,6 +44,10 @@ const dateFormatted = new Intl.DateTimeFormat('en-US', {
   year: 'numeric', 
   month: 'long' 
 }).format(entry.data.date);
+
+const words = entry.body.trim().split(/\s+/).length;
+const readTimeMinutes = Math.max(1, Math.round(words / 200));
+const readTime = `${readTimeMinutes} min read`;
 
 const metaDescription = entry.data.abstract.slice(0, 150);
 ---
@@ -54,7 +66,11 @@ const metaDescription = entry.data.abstract.slice(0, 150);
     <header class="paper-header">
       <div class="paper-meta">
         <span class="eyebrow">{entry.data.isProposal ? 'Thesis Proposal' : 'Research Brief'}</span>
-        <span class="paper-date">{dateFormatted}</span>
+        <div class="meta-right">
+          <span class="paper-date">{dateFormatted}</span>
+          <span class="meta-sep">&bull;</span>
+          <span class="reading-time">{readTime}</span>
+        </div>
       </div>
 
       <h1 class="paper-title">{entry.data.title}</h1>
@@ -164,6 +180,31 @@ const metaDescription = entry.data.abstract.slice(0, 150);
         </div>
       </div>
     </DualPaneViewer>
+
+    <nav class="article-pagination" aria-label="Sequential Research Navigation">
+      <div class="pagination-prev">
+        {prevEntry && (
+          <a href={`/research/${prevEntry.slug}`} class="pagination-link prev">
+            <span class="pagination-direction">&larr; Older Publication</span>
+            <span class="pagination-title">{prevEntry.data.title}</span>
+          </a>
+        )}
+      </div>
+      <div class="pagination-index">
+        <a href="/research" class="pagination-link index">
+          <span class="pagination-direction">Directory</span>
+          <span class="pagination-title">All Research</span>
+        </a>
+      </div>
+      <div class="pagination-next">
+        {nextEntry && (
+          <a href={`/research/${nextEntry.slug}`} class="pagination-link next">
+            <span class="pagination-direction">Newer Publication &rarr;</span>
+            <span class="pagination-title">{nextEntry.data.title}</span>
+          </a>
+        )}
+      </div>
+    </nav>
   </div>
 </BaseLayout>
 
@@ -205,6 +246,17 @@ const metaDescription = entry.data.abstract.slice(0, 150);
     font-family: var(--font-sans);
     font-size: 0.8125rem;
     color: var(--color-text-muted);
+  }
+
+  .meta-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .meta-sep {
+    color: var(--color-border);
+    font-size: 0.75rem;
   }
 
   .paper-title {

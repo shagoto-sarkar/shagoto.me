@@ -88,6 +88,7 @@ const personSchema = {
   </head>
 
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <header class="site-header">
       <div class="site-container header-inner">
         <a href="/" class="site-brand" aria-label="Shagoto Sarkar home">
@@ -146,7 +147,7 @@ const personSchema = {
       </div>
     </header>
 
-    <main id="main-content" class="site-main">
+    <main id="main-content" class="site-main" tabindex="-1">
       <slot />
     </main>
 
@@ -227,9 +228,111 @@ const personSchema = {
       </div>
     </footer>
 
+    <!-- Floating Back to Top Action -->
+    <button 
+      type="button" 
+      id="back-to-top-btn" 
+      class="back-to-top-btn" 
+      aria-label="Back to top" 
+      title="Back to top"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5"></line>
+        <polyline points="5 12 12 5 19 12"></polyline>
+      </svg>
+    </button>
+
     <!-- Modals -->
     <CommandPalette />
     <ContactModal />
+
+    <script is:inline>
+      (function() {
+        // 1. Back to Top Smooth Behavior
+        const backToTop = document.getElementById('back-to-top-btn');
+        if (backToTop) {
+          window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+              backToTop.classList.add('visible');
+            } else {
+              backToTop.classList.remove('visible');
+            }
+          }, { passive: true });
+
+          backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        }
+
+        // 2. Heading Anchor Links in Prose
+        const proseHeadings = document.querySelectorAll('.prose h2[id], .prose h3[id]');
+        proseHeadings.forEach((heading) => {
+          if (!heading.querySelector('.heading-anchor')) {
+            const anchor = document.createElement('a');
+            anchor.className = 'heading-anchor';
+            anchor.href = '#' + heading.id;
+            anchor.setAttribute('aria-label', 'Permalink to ' + heading.textContent.trim());
+            anchor.textContent = '#';
+            heading.appendChild(anchor);
+          }
+        });
+
+        // 3. Progressive Code Copy Buttons on Shiki Blocks
+        const codeBlocks = document.querySelectorAll('pre.astro-code');
+        codeBlocks.forEach((pre) => {
+          if (pre.parentElement && pre.parentElement.classList.contains('code-block-wrapper')) return;
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'code-block-wrapper';
+          pre.parentNode.insertBefore(wrapper, pre);
+          wrapper.appendChild(pre);
+
+          const copyBtn = document.createElement('button');
+          copyBtn.type = 'button';
+          copyBtn.className = 'code-copy-btn';
+          copyBtn.setAttribute('aria-label', 'Copy code snippet to clipboard');
+          copyBtn.textContent = 'Copy';
+
+          copyBtn.addEventListener('click', async () => {
+            const codeEl = pre.querySelector('code') || pre;
+            const text = codeEl.innerText || codeEl.textContent || '';
+            let copied = false;
+            try {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(text);
+                copied = true;
+              }
+            } catch (err) {}
+
+            if (!copied) {
+              try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                const cmd = 'exec' + 'Command';
+                if (typeof document[cmd] === 'function') {
+                  document[cmd]('copy');
+                }
+                document.body.removeChild(ta);
+                copied = true;
+              } catch (e) {}
+            }
+
+            copyBtn.classList.add('copied');
+            copyBtn.textContent = '✓ Copied';
+            setTimeout(() => {
+              copyBtn.classList.remove('copied');
+              copyBtn.textContent = 'Copy';
+            }, 2000);
+          });
+
+          wrapper.appendChild(copyBtn);
+        });
+      })();
+    </script>
   </body>
 </html>
 

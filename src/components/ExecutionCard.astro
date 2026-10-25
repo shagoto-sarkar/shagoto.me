@@ -32,7 +32,7 @@ const dateFormatted = date
   : undefined;
 ---
 
-<article class="editorial-entry">
+<article class="editorial-entry" data-category={category ? category.toLowerCase() : ''}>
   <div class="entry-meta">
     {category && <span class="entry-category">{category}</span>}
     {status && (
@@ -60,12 +60,13 @@ const dateFormatted = date
   )}
 
   <div class="entry-action">
-    <a href={href} class="entry-link">{actionText}</a>
+    <a href={href} class="entry-link" tabindex="-1" aria-hidden="true">{actionText}</a>
   </div>
 </article>
 
 <style>
   .editorial-entry {
+    position: relative;
     display: flex;
     flex-direction: column;
     padding: var(--space-6);
@@ -76,7 +77,20 @@ const dateFormatted = date
   }
 
   .editorial-entry:hover {
-    border-color: var(--color-text-muted);
+    border-color: var(--color-text-secondary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+
+  .editorial-entry:hover .entry-title a,
+  .editorial-entry:hover .entry-link {
+    color: var(--color-accent);
+  }
+
+  .entry-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
   }
 
   .entry-meta {

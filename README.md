@@ -5,20 +5,20 @@ Personal academic and systems engineering publication of Shagoto Sarkar.
 - **Production URL:** [https://shagoto.me](https://shagoto.me)
 - **Pages Origin:** [https://shagoto-me.pages.dev](https://shagoto-me.pages.dev)
 - **Architecture Guide:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
-- **AI Agent Routing:** [`AGENTS.md`](AGENTS.md)
+- **AI Agent Routing Guide:** [`AGENTS.md`](AGENTS.md)
 
 ---
 
-## Tech Stack & Architecture
+## Tech Stack
 
-| Layer | Technologies | Role |
+| Layer | Technology | Role |
 | :--- | :--- | :--- |
-| **Static Generator** | Astro 5.4+ (`output: 'static'`), TypeScript (strict) | Zero client UI runtime, 100% pre-rendered HTML/CSS |
-| **Design System** | Vanilla CSS (`AXIOM Design System v2`) | Refined Technical Editorialism, semantic CSS custom properties |
-| **Typography** | Self-hosted *EB Garamond* & *JetBrains Mono* | 52 `.woff2` font files served locally with immutable caching |
-| **Diagrams & Syntax**| Inline accessible SVGs + Build-time Shiki | Zero client runtime overhead, full screen reader support |
-| **Edge Hosting** | Cloudflare Pages + Anycast CDN | Instant global distribution, automated TLS, immutable headers |
-| **Content Layer** | Astro Content Collections + Zod validation | Type-safe markdown collections for research, projects & notes |
+| **Static Generator** | Astro 5.4+ (`output: 'static'`) | Zero-JS client runtime, 100% pre-rendered static HTML |
+| **Type Safety** | TypeScript (strict) + Zod | Schema validation for markdown collections & build diagnostics |
+| **Design System** | Vanilla CSS (`AXIOM v2`) | Refined Technical Editorialism, semantic custom properties |
+| **Typography** | Self-hosted *EB Garamond* & *JetBrains Mono* | 52 local `.woff2` files served with immutable cache headers |
+| **Diagrams & Syntax** | Inline SVGs + Build-time Shiki | Zero client runtime overhead, accessible `aria-label` tags |
+| **Hosting & Edge** | Cloudflare Pages + Anycast CDN | Global edge distribution, automated SSL, custom headers |
 
 ---
 
@@ -28,62 +28,82 @@ Personal academic and systems engineering publication of Shagoto Sarkar.
 shagoto.me/
 ├── src/
 │   ├── assets/
-│   │   └── diagrams/          # Architecture SVGs (Cash, Go, Log, OpenGL, etc.)
+│   │   └── diagrams/              # Architecture SVGs (CashApp, Go, Log, SerialNow, etc.)
 │   ├── components/
-│   │   ├── CommandPalette.astro # Fuzzy search launcher (Cmd+K / Ctrl+K)
-│   │   ├── ContactModal.astro # Accessible contact dialog & clipboard copy
-│   │   ├── Footer.astro       # Editorial footer & verified social channels
-│   │   └── Header.astro       # Top navigation, status indicator & search button
-│   ├── content/               # Type-safe Astro Markdown content collections
-│   │   ├── notes/             # Technical essays & systems notes
-│   │   ├── projects/          # Systems engineering & open-source case studies
-│   │   ├── research/          # Neuro-symbolic reasoning & formal verification papers
-│   │   └── config.ts          # Zod schema definitions for all content collections
+│   │   ├── ArchitectureDiagram.astro # Responsive SVG diagram container with aria descriptors
+│   │   ├── CommandPalette.astro   # Accessible fuzzy search modal (Cmd+K / Ctrl+K)
+│   │   ├── ContactModal.astro     # Contact dialog, 1-click clipboard copy & socials
+│   │   ├── DualPaneViewer.astro   # Scholarly viewer: abstract + Z3 SMT solver spec
+│   │   └── ExecutionCard.astro    # Editorial listing card for research, projects & notes
+│   ├── content/                   # Zod-validated Markdown collections
+│   │   ├── notes/                 # Field essays & systems notes (3 entries)
+│   │   ├── projects/              # Systems engineering case studies (7 entries)
+│   │   ├── research/              # Formal verification & neuro-symbolic papers (2 entries)
+│   │   └── config.ts              # Zod schema definitions for all content collections
 │   ├── layouts/
-│   │   └── BaseLayout.astro   # Root HTML shell, SEO metadata, canonical links & fonts
+│   │   └── BaseLayout.astro       # Root HTML shell, nav header, footer, SEO & JSON-LD
 │   ├── pages/
-│   │   ├── notes/             # Notes index and [...slug].astro dynamic routes
-│   │   ├── projects/          # Projects index and [...slug].astro dynamic routes
-│   │   ├── research/          # Research index and [...slug].astro dynamic routes
-│   │   ├── 404.astro          # Custom 404 error page (noindex, nofollow)
-│   │   └── index.astro        # Editorial homepage
+│   │   ├── 404.astro              # Custom 404 page (noindex, nofollow)
+│   │   ├── index.astro            # Editorial homepage & active investigation areas
+│   │   ├── notes/                 # Notes archive index & dynamic [...slug].astro
+│   │   ├── projects/              # Projects archive index & dynamic [...slug].astro
+│   │   └── research/              # Research archive index & dynamic [...slug].astro
 │   └── styles/
-│       └── global.css         # AXIOM v2 CSS custom properties & typography tokens
-├── public/                    # Static public assets (_headers, robots.txt, fonts, cv.pdf)
+│       └── global.css             # AXIOM v2 CSS custom properties, resets & font definitions
+├── public/
+│   ├── fonts/                     # 52 self-hosted .woff2 font binaries
+│   ├── _headers                   # Cloudflare security headers & 1-year immutable caching
+│   ├── CNAME                      # Custom apex domain pointer (shagoto.me)
+│   ├── cv.pdf                     # Curriculum Vitae binary document
+│   └── robots.txt                 # Crawler rules & sitemap index reference
 ├── scripts/
-│   └── test_site.js           # Production verification test suite (HTML & DOM audit)
-├── ARCHITECTURE.md            # Deep system architecture & editorial guidelines
-├── AGENTS.md                  # AI coding agent routing rules & invariants
-├── astro.config.mjs           # Astro configuration with sitemap integration
-├── wrangler.jsonc             # Cloudflare Pages deployment configuration
-└── package.json               # Scripts & dependencies
+│   ├── generate_diagrams.js       # Mermaid to SVG generator script
+│   ├── mermaid.min.js             # Pre-compiled Mermaid vendor runtime for build script
+│   └── test_site.js               # CI production verification audit test suite
+├── .github/workflows/deploy.yml   # GitHub Actions CI & manual production deploy workflow
+├── ARCHITECTURE.md                # Technical specification & system architecture
+├── AGENTS.md                      # AI coding agent routing map & codebase invariants
+├── astro.config.mjs               # Astro site config & sitemap integration
+├── package.json                   # Scripts, dependencies & project metadata
+└── wrangler.jsonc                 # Cloudflare Pages deployment configuration
 ```
+
+---
+
+## Data Flow & Core Abstractions
+
+1. **Content Definition & Validation:** Markdown files in `src/content/{research,projects,notes}` define frontmatter strictly typed by Zod schemas in `src/content/config.ts`.
+2. **Static Route Generation:** Dynamic pages (`src/pages/*/[...slug].astro`) execute `getStaticPaths()` using `getCollection()`, injecting content and resolving architecture SVGs from `src/assets/diagrams/`.
+3. **Syntax Highlighting & Formatting:** Shiki highlights code blocks during static generation with `github-dark-dimmed` theme; date formatting is localized via `Intl.DateTimeFormat`.
+4. **Layout & Editorial Shell:** `src/layouts/BaseLayout.astro` wraps all pages, injecting self-hosted font faces, canonical URL tags, Schema.org `Person` JSON-LD, global navigation, and the footer.
+5. **Client-Side Interactivity (Zero Frameworks):** Micro-interactions in `CommandPalette.astro` (fuzzy search filtering, keyboard shortcuts) and `ContactModal.astro` (clipboard copy, backdrop dismiss) operate with vanilla DOM event listeners.
+6. **Edge CDN Delivery:** The compiled `dist/` directory deploys to Cloudflare Pages, applying caching rules from `public/_headers` (1-year immutable for `/_astro/*` and `/fonts/*`).
 
 ---
 
 ## Operational CLI Commands
 
 ```bash
-# 1. Install dependencies
+# 1. Install project dependencies
 npm install
 
-# 2. Start local Astro development server (Port 4321)
+# 2. Start local Astro dev server (http://localhost:4321)
 npm run dev
 
-# 3. Run Astro schema & TypeScript diagnostics
+# 3. Type-check & content schema diagnostics
 npm run check
 
-# 4. Full production test suite (build + check + scripts/test_site.js)
+# 4. Production verification suite (Build + Diagnostics + test_site.js)
 npm test
 
-# 5. Build static production distribution (dist/)
+# 5. Compile static production build (outputs to dist/)
 npm run build
 
-# 6. Preview local production build (Port 4321)
+# 6. Preview compiled production build locally
 npm run preview
 
-# 7. Deploy directly to Cloudflare Pages from terminal
+# 7. Manual deploy to Cloudflare Pages via Wrangler
 npm run deploy
 ```
 
-For complete technical architecture, design tokens, and editorial invariants, see [`ARCHITECTURE.md`](ARCHITECTURE.md). For AI coding guidelines and DOM hook requirements, see [`AGENTS.md`](AGENTS.md).
+For complete technical specifications, see [`ARCHITECTURE.md`](ARCHITECTURE.md). For AI coding rules, see [`AGENTS.md`](AGENTS.md).

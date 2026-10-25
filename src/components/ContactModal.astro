@@ -17,12 +17,13 @@
     <div class="contact-card-body">
       <div class="email-display-container">
         <span class="email-label">Email Address:</span>
-        <div class="email-field">
+        <div class="email-field" id="email-field-box" role="button" tabindex="0" title="Click to copy email address" aria-label="Copy email address to clipboard">
           <code class="email-text" id="target-email">shagotosarkar@gmail.com</code>
-          <button type="button" id="copy-email-btn" class="button copy-btn" title="Copy to clipboard">
+          <button type="button" id="copy-email-btn" class="button copy-btn" title="Copy to clipboard" aria-label="Copy email address">
             <span id="copy-btn-label">Copy</span>
           </button>
         </div>
+        <div id="contact-copy-live" class="visually-hidden" aria-live="polite"></div>
       </div>
 
       <div class="contact-options-grid">
@@ -201,10 +202,23 @@
     const closeBtn = document.getElementById('contact-modal-close');
     const copyBtn = document.getElementById('copy-email-btn');
     const copyLabel = document.getElementById('copy-btn-label');
+    const emailBox = document.getElementById('email-field-box');
+    const liveStatus = document.getElementById('contact-copy-live');
     const emailToCopy = 'shagotosarkar@gmail.com';
 
     let copyTimeout = null;
     let previousActiveElement = null;
+
+    function setOutsideInert(isInert) {
+      const landmarks = document.querySelectorAll('.site-header, .site-main, .site-footer');
+      landmarks.forEach(el => {
+        if (isInert) {
+          el.setAttribute('inert', '');
+        } else {
+          el.removeAttribute('inert');
+        }
+      });
+    }
 
     function openModal() {
       if (!backdrop) return;
@@ -212,6 +226,7 @@
       document.body.style.overflow = 'hidden';
       backdrop.style.display = 'flex';
       backdrop.setAttribute('aria-hidden', 'false');
+      setOutsideInert(true);
       if (closeBtn) closeBtn.focus();
     }
 
@@ -220,6 +235,7 @@
       document.body.style.overflow = '';
       backdrop.style.display = 'none';
       backdrop.setAttribute('aria-hidden', 'true');
+      setOutsideInert(false);
       if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
         previousActiveElement.focus();
       }
@@ -235,6 +251,25 @@
           closeModal();
         }
       });
+
+      // Trap Tab key within modal
+      backdrop.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          const focusables = backdrop.querySelectorAll('button, a[href], [tabindex="0"]');
+          const visible = Array.from(focusables).filter(el => el.offsetParent !== null);
+          if (visible.length < 2) return;
+          const first = visible[0];
+          const last = visible[visible.length - 1];
+
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      });
     }
 
     window.addEventListener('keydown', (e) => {
@@ -244,52 +279,72 @@
       }
     });
 
-    if (copyBtn && copyLabel) {
-      copyBtn.addEventListener('click', async () => {
-        if (copyTimeout) {
-          clearTimeout(copyTimeout);
-          copyTimeout = null;
-        }
+    async function executeCopy() {
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+        copyTimeout = null;
+      }
 
-        let copied = false;
+      let copied = false;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(emailToCopy);
+          copied = true;
+        }
+      } catch (err) {
+        // Fallback below
+      }
+
+      if (!copied) {
         try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(emailToCopy);
-            copied = true;
+          const tempTextarea = document.createElement('textarea');
+          tempTextarea.value = emailToCopy;
+          tempTextarea.style.position = 'fixed';
+          tempTextarea.style.opacity = '0';
+          tempTextarea.style.top = '-9999px';
+          tempTextarea.style.left = '-9999px';
+          document.body.appendChild(tempTextarea);
+          tempTextarea.focus();
+          tempTextarea.select();
+          const cmd = 'exec' + 'Command';
+          if (typeof document[cmd] === 'function') {
+            document[cmd]('copy');
           }
-        } catch (err) {
-          // Clipboard API failed or denied permission, fallback to execCommand
-        }
+          document.body.removeChild(tempTextarea);
+          copied = true;
+        } catch (fallbackErr) {}
+      }
 
-        if (!copied) {
-          try {
-            const tempTextarea = document.createElement('textarea');
-            tempTextarea.value = emailToCopy;
-            tempTextarea.style.position = 'fixed';
-            tempTextarea.style.opacity = '0';
-            tempTextarea.style.top = '-9999px';
-            tempTextarea.style.left = '-9999px';
-            document.body.appendChild(tempTextarea);
-            tempTextarea.focus();
-            tempTextarea.select();
-            const cmd = 'exec' + 'Command';
-            if (typeof document[cmd] === 'function') {
-              document[cmd]('copy');
-            }
-            document.body.removeChild(tempTextarea);
-            copied = true;
-          } catch (fallbackErr) {
-            // execCommand also failed
-          }
-        }
+      if (copyLabel) copyLabel.textContent = '✓ Copied!';
+      if (copyBtn) copyBtn.style.borderColor = 'var(--color-accent)';
+      if (emailBox) emailBox.style.borderColor = 'var(--color-accent)';
+      if (liveStatus) liveStatus.textContent = 'Email address copied to clipboard.';
 
-        copyLabel.textContent = '✓ Copied!';
-        copyBtn.style.borderColor = 'var(--color-accent)';
-        copyTimeout = setTimeout(() => {
-          copyLabel.textContent = 'Copy';
-          copyBtn.style.borderColor = '';
-          copyTimeout = null;
-        }, 2000);
+      copyTimeout = setTimeout(() => {
+        if (copyLabel) copyLabel.textContent = 'Copy';
+        if (copyBtn) copyBtn.style.borderColor = '';
+        if (emailBox) emailBox.style.borderColor = '';
+        if (liveStatus) liveStatus.textContent = '';
+        copyTimeout = null;
+      }, 2000);
+    }
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        executeCopy();
+      });
+    }
+
+    if (emailBox) {
+      emailBox.addEventListener('click', () => {
+        executeCopy();
+      });
+      emailBox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          executeCopy();
+        }
       });
     }
 

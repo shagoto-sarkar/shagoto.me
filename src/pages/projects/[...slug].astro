@@ -7,18 +7,26 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export async function getStaticPaths() {
-  const projectEntries = await getCollection('projects');
-  return projectEntries.map((entry: CollectionEntry<'projects'>) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+  const projectEntries = (await getCollection('projects')).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  );
+  return projectEntries.map((entry: CollectionEntry<'projects'>, index: number) => {
+    const prevEntry = index < projectEntries.length - 1 ? projectEntries[index + 1] : null;
+    const nextEntry = index > 0 ? projectEntries[index - 1] : null;
+    return {
+      params: { slug: entry.slug },
+      props: { entry, prevEntry, nextEntry },
+    };
+  });
 }
 
 interface Props {
   entry: CollectionEntry<'projects'>;
+  prevEntry?: CollectionEntry<'projects'> | null;
+  nextEntry?: CollectionEntry<'projects'> | null;
 }
 
-const { entry } = Astro.props;
+const { entry, prevEntry, nextEntry } = Astro.props;
 const { Content } = await entry.render();
 
 const diagramMap: Record<string, string> = {
@@ -47,6 +55,10 @@ const dateFormatted = new Intl.DateTimeFormat('en-US', {
   day: 'numeric' 
 }).format(entry.data.date);
 
+const words = entry.body.trim().split(/\s+/).length;
+const readTimeMinutes = Math.max(1, Math.round(words / 200));
+const readTime = `${readTimeMinutes} min read`;
+
 const metaDescription = entry.data.constraint.slice(0, 150);
 ---
 
@@ -65,7 +77,11 @@ const metaDescription = entry.data.constraint.slice(0, 150);
       <header class="project-header">
         <div class="project-meta">
           <span class="eyebrow">Technical Brief</span>
-          <span class="project-date">{dateFormatted}</span>
+          <div class="meta-right">
+            <span class="project-date">{dateFormatted}</span>
+            <span class="meta-sep">&bull;</span>
+            <span class="reading-time">{readTime}</span>
+          </div>
         </div>
 
         <h1 class="project-title">{entry.data.title}</h1>
@@ -110,6 +126,31 @@ const metaDescription = entry.data.constraint.slice(0, 150);
       <div class="project-prose prose">
         <Content />
       </div>
+
+      <nav class="article-pagination" aria-label="Sequential Project Navigation">
+        <div class="pagination-prev">
+          {prevEntry && (
+            <a href={`/projects/${prevEntry.slug}`} class="pagination-link prev">
+              <span class="pagination-direction">&larr; Older Project</span>
+              <span class="pagination-title">{prevEntry.data.title}</span>
+            </a>
+          )}
+        </div>
+        <div class="pagination-index">
+          <a href="/projects" class="pagination-link index">
+            <span class="pagination-direction">Directory</span>
+            <span class="pagination-title">All Projects</span>
+          </a>
+        </div>
+        <div class="pagination-next">
+          {nextEntry && (
+            <a href={`/projects/${nextEntry.slug}`} class="pagination-link next">
+              <span class="pagination-direction">Newer Project &rarr;</span>
+              <span class="pagination-title">{nextEntry.data.title}</span>
+            </a>
+          )}
+        </div>
+      </nav>
     </article>
   </div>
 </BaseLayout>
@@ -152,6 +193,17 @@ const metaDescription = entry.data.constraint.slice(0, 150);
     font-family: var(--font-sans);
     font-size: 0.8125rem;
     color: var(--color-text-muted);
+  }
+
+  .meta-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .meta-sep {
+    color: var(--color-border);
+    font-size: 0.75rem;
   }
 
   .project-title {
