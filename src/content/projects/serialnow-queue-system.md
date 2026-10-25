@@ -10,11 +10,11 @@ demoVideoAvailable: false
 
 ## The Constraint
 
-In outpatient medical chambers throughout Bangladesh, single-doctor practices operate under extreme physical queue pressure. A single physician typically evaluates 50 to 60 patients during an evening session across two divergent clinical modalities: new primary diagnostic consultations and follow-up reviews of diagnostic pathology or imaging reports.
+In outpatient medical chambers throughout Bangladesh (Dhaka, Chittagong, and district divisional hubs), single-doctor practices operate under extreme physical queue pressure. A single physician typically evaluates 50 to 60 patients during an evening session across two divergent clinical modalities: new primary diagnostic consultations and follow-up reviews of diagnostic pathology or imaging reports.
 
-Receptionists—frequently university students or medical apprentices of the consulting physician—serve as the sole operational buffer between an anxious waiting room and the consultation door. They face continuous, high-stress interruptions (*"Koto serial cholche?"*, *"Ami kokhon jabo?"*). Under this strain, traditional healthcare IT solutions and hospital ERP platforms suffer immediate operational rejection:
+Receptionists—frequently university students, medical apprentices, or junior clinic assistants of the consulting physician—serve as the sole operational buffer between an anxious, congested waiting room and the consultation door. They face continuous, high-stress interruptions (*"Koto serial cholche?"*, *"Ami kokhon jabo?"*). Under this strain, traditional healthcare IT solutions, mobile token platforms, and enterprise hospital ERPs suffer immediate operational rejection:
 
-* **The Digital Compulsion Anti-Pattern:** Demanding that sick, elderly, or tech-averse patients download mobile applications, create user accounts, or verify SMS OTPs to secure a place in line introduces friction that halts clinic operations.
+* **The Digital Compulsion Anti-Pattern:** Demanding that sick, exhausted, elderly, or tech-averse patients download mobile applications, create passworded user accounts, or verify SMS OTPs to secure a place in line introduces friction that halts clinic operations.
 * **The Receptionist Cognitive Chokepoint:** Multi-step modal dialogues, redundant form validations, and complex dropdowns slow down physical intake. In a busy clinic, an interface that cannot outperform pen-and-paper in speed is discarded during peak hours.
 * **The Fallacy of Hallucinated Wait Countdowns:** Clinical encounter times exhibit high natural variance; a follow-up report review may conclude in two minutes, while an acute diagnostic workup requires thirty. Systems that display linear countdown clocks (*"Your turn in 14 minutes"*) fabricate false promises and aggravate waiting-room disputes when schedules shift.
 
@@ -31,9 +31,37 @@ For **`SerialNow.`** (published by S.goto Lab under internal development codenam
 The receptionist is the primary operator and the decisive adoption gate. `SerialNow.` treats the front-desk interface as an ergonomic mission-control console engineered for rapid keyboard and touch execution:
 
 * **Sub-Second Core Operations:** Primary queue transitions execute through single-tap and hotkeyed actions: `Complete & Next`, `Skip & Next`, `Recall`, `Complete only`, and `Skip only`.
-* **5-Second Compensating Undo & Tap Guard:** Accidental double-clicks and misclicks are trapped by a debounce guard. A non-destructive 5-second `Undo` buffer allows operators to reverse accidental state changes immediately. Reversals do not erase historical events; they append linked compensating records to the audit stream.
+* **5-Second Compensating Undo & Tap Guard:** Accidental double-clicks and misclicks are trapped by a 450ms debounce guard. A non-destructive 5-second `Undo` buffer allows operators to reverse accidental state changes immediately. Reversals do not erase historical events; they append linked compensating records to the audit stream.
 * **Model B Calling Semantics:** Patients are **never** required to interact with an application, verify an SMS token, or confirm arrival digitally. A booking is callable the moment it is entered. Digital silence never marks a patient absent or skips their place; the doctor or receptionist physically calls the ticket number in the waiting room.
 * **Desk Adoption Benchmark:** Design decisions are judged by whether an operator can state: *"আমাদের চেম্বারে SerialNow ব্যবহার করি"* without feeling slowed down by data entry.
+
+```typescript
+// Append-Only Compensating Undo Invariant (No History Erasure)
+export interface DemoEvent {
+  id: string;
+  timestamp: string;
+  actor: string;
+  command: DemoCommand;
+  effect: DemoEffect;
+  correctionOf?: string; // Linked prior event ID for non-destructive reversal
+}
+
+// Reversals append a compensating transition; historical event stream remains immutable
+if (command.type === 'undo') {
+  const targetEvent = state.events.find((e) => e.id === command.eventId);
+  if (!targetEvent) return reject(state, 'Target event not found in audit stream');
+
+  const compensatingEvent: DemoEvent = {
+    id: generateEventId(),
+    timestamp: currentSyntheticTime(),
+    actor: 'receptionist',
+    command,
+    effect: computeInverseEffect(targetEvent.effect),
+    correctionOf: targetEvent.id,
+  };
+  return applyCompensatingTransition(state, compensatingEvent);
+}
+```
 
 ### 2. Deterministic Dual-Lane Batch Rotation (A/B/X Engine)
 
@@ -71,6 +99,39 @@ The rotation engine enforces strict mathematical invariants:
 * **Lane X Interleaving:** Exceptional cases routed through Lane X temporarily pause the active batch without resetting either lane's progress counter. If an existing Lane A or B patient is served via Lane X, their original serial is preserved while their queue eligibility is retired, preventing duplicate consultations.
 * **Late-Patient Rejoin Placement:** When a skipped patient returns, they are appended behind all currently uncalled, eligible bookings in their **original category** at the timestamp of the rejoin transaction, with an optional receptionist front override.
 
+```typescript
+// Deterministic Dual-Lane Batch Rotation & Boundary Arbiter
+export const ordinaryEligible = (core: DemoCore, lane: OrdinaryLane): DemoVisit[] =>
+  core.visits
+    .filter(
+      (visit) =>
+        !sessionReadOnly(core.sessionStatus) &&
+        visit.category === lane &&
+        visit.status === 'uncalled' &&
+        !visit.exception,
+    )
+    .sort((a, b) => a.order - b.order);
+
+function settleBoundary(core: DemoCore, rotate = true): void {
+  const manual = core.pendingOrdinary;
+  if (manual) core.active = manual;
+  core.pendingOrdinary = null;
+
+  const other: OrdinaryLane = core.active === 'A' ? 'B' : 'A';
+
+  // Batch quota consumed ONLY upon confirmed completion; progress is preserved independently
+  if (
+    !manual &&
+    (((rotate) &&
+      core.batches[core.active].completed >= core.batches[core.active].target) ||
+      ordinaryEligible(core, core.active).length === 0) &&
+    ordinaryEligible(core, other).length > 0
+  ) {
+    core.active = other;
+  }
+}
+```
+
 ### 3. Zero-PII Patient Transparency Projection (`/preview/patient`)
 
 Patients access an unauthenticated, read-only tracking view designed for low-end mobile devices and unstable cellular data:
@@ -79,6 +140,36 @@ Patients access an unauthenticated, read-only tracking view designed for low-end
 * **Uncalled Count vs. Physical Presence:** The interface displays the exact count of uncalled bookings ahead within the patient's own category, explicitly informing the user that this metric reflects registered bookings rather than physical waiting-room attendance.
 * **Anti-Hallucination Temporal Semantics:** The system explicitly displays that waiting time is nondeterministic (*"অপেক্ষার সময় অপরিবর্তনীয়/অজানা"*), refusing to generate speculative countdown clocks.
 * **Stale & Offline Telemetry:** Offline and stale states visibly display the exact verified synchronization timestamp (`Asia/Dhaka`). If the network disconnects, the interface indicates data staleness rather than displaying a false empty queue.
+
+```typescript
+// Strict Whitelist Projection Pipeline — Zero PII Leakage
+export function projectPatientSnapshot(input: PatientSnapshot): PatientSnapshot {
+  const current = input.currentCall;
+  return {
+    serial: input.serial,
+    category: input.category,
+    visitStatus: input.visitStatus,
+    sessionDate: input.sessionDate,
+    scheduledStart: input.scheduledStart,
+    actualStart: input.actualStart,
+    doctorStatus: input.doctorStatus,
+    // Lane X triage cases intentionally omit serial numbers and clinical reasons
+    currentCall:
+      current === null
+        ? null
+        : current.lane === 'X'
+          ? { lane: 'X' }
+          : { lane: current.lane, serial: current.serial },
+    ownAhead: input.ownAhead, // Count of uncalled registered bookings ahead (not physical presence)
+    ownBatch: {
+      completed: input.ownBatch.completed,
+      target: input.ownBatch.target,
+    },
+    rejoined: input.rejoined,
+    lastUpdatedUtc: input.lastUpdatedUtc,
+  };
+}
+```
 
 ### 4. Mineral Teal Demeanor & Low-Fatigue Contrast
 
