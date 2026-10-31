@@ -250,7 +250,7 @@ const personSchema = {
               class="footer-link footer-contact-btn"
               onclick="window.openContactModal && window.openContactModal()"
             >
-              shagotosarkar@gmail.com
+              <!--email_off-->shagotosarkar@gmail.com<!--/email_off-->
             </button>
             <a
               href="https://github.com/shagoto-sarkar"
@@ -332,14 +332,29 @@ const personSchema = {
 
     <script is:inline>
       (function() {
-        // 1. Back to Top Smooth Behavior
+        const onIdle = (cb) => {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(cb, { timeout: 1500 });
+          } else {
+            setTimeout(cb, 1);
+          }
+        };
+
+        // 1. Back to Top Smooth Behavior (rAF throttled)
         const backToTop = document.getElementById('back-to-top-btn');
         if (backToTop) {
+          let scrollTicking = false;
           window.addEventListener('scroll', () => {
-            if (window.scrollY > 400) {
-              backToTop.classList.add('visible');
-            } else {
-              backToTop.classList.remove('visible');
+            if (!scrollTicking) {
+              window.requestAnimationFrame(() => {
+                if (window.scrollY > 400) {
+                  backToTop.classList.add('visible');
+                } else {
+                  backToTop.classList.remove('visible');
+                }
+                scrollTicking = false;
+              });
+              scrollTicking = true;
             }
           }, { passive: true });
 
@@ -348,27 +363,7 @@ const personSchema = {
           });
         }
 
-        // 2. Heading Anchor Links in Prose
-        const proseHeadings = document.querySelectorAll('.prose h2[id], .prose h3[id]');
-        proseHeadings.forEach((heading) => {
-          if (!heading.querySelector('.heading-anchor')) {
-            const anchor = document.createElement('a');
-            anchor.className = 'heading-anchor';
-            anchor.href = '#' + heading.id;
-            anchor.setAttribute('aria-label', 'Permalink to ' + heading.textContent.trim());
-            anchor.textContent = '#';
-            heading.appendChild(anchor);
-          }
-        });
-
-        // 3. Platform Detection for Search Trigger Display
-        const isMac = typeof navigator !== 'undefined' && /Macintosh|Mac OS X|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const searchKey = document.getElementById('desktop-search-key');
-        if (searchKey) {
-          searchKey.textContent = isMac ? '⌘K' : 'Ctrl K';
-        }
-
-        // 4. Mobile Menu Controller
+        // 2. Mobile Menu Controller
         const menuBtn = document.getElementById('mobile-menu-btn');
         const menuPanel = document.getElementById('mobile-nav-panel');
         const iconBars = menuBtn ? menuBtn.querySelector('.menu-icon-bars') : null;
@@ -433,63 +428,86 @@ const personSchema = {
           });
         }
 
-        // 5. Progressive Code Copy Buttons on Shiki Blocks
-        const codeBlocks = document.querySelectorAll('pre.astro-code');
-        codeBlocks.forEach((pre) => {
-          if (pre.parentElement && pre.parentElement.classList.contains('code-block-wrapper')) return;
+        // 3. Deferred Progressive Enhancements (Idle scheduled to avoid long main-thread tasks)
+        onIdle(() => {
+          // Platform Detection for Search Trigger Display
+          const isMac = typeof navigator !== 'undefined' && /Macintosh|Mac OS X|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          const searchKey = document.getElementById('desktop-search-key');
+          if (searchKey) {
+            searchKey.textContent = isMac ? '⌘K' : 'Ctrl K';
+          }
 
-          const wrapper = document.createElement('div');
-          wrapper.className = 'code-block-wrapper';
-          pre.parentNode.insertBefore(wrapper, pre);
-          wrapper.appendChild(pre);
-
-          const copyBtn = document.createElement('button');
-          copyBtn.type = 'button';
-          copyBtn.className = 'code-copy-btn';
-          copyBtn.setAttribute('aria-label', 'Copy code snippet to clipboard');
-          copyBtn.textContent = 'Copy';
-
-          copyBtn.addEventListener('click', async () => {
-            const codeEl = pre.querySelector('code') || pre;
-            const text = codeEl.innerText || codeEl.textContent || '';
-            let copied = false;
-            try {
-              if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(text);
-                copied = true;
-              }
-            } catch (err) {}
-
-            if (!copied) {
-              try {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.select();
-                const cmd = 'exec' + 'Command';
-                if (typeof document[cmd] === 'function') {
-                  copied = Boolean(document[cmd]('copy'));
-                }
-                document.body.removeChild(ta);
-              } catch (e) {}
+          // Heading Anchor Links in Prose
+          const proseHeadings = document.querySelectorAll('.prose h2[id], .prose h3[id]');
+          proseHeadings.forEach((heading) => {
+            if (!heading.querySelector('.heading-anchor')) {
+              const anchor = document.createElement('a');
+              anchor.className = 'heading-anchor';
+              anchor.href = '#' + heading.id;
+              anchor.setAttribute('aria-label', 'Permalink to ' + heading.textContent.trim());
+              anchor.textContent = '#';
+              heading.appendChild(anchor);
             }
-
-            if (copied) {
-              copyBtn.classList.add('copied');
-              copyBtn.textContent = '✓ Copied';
-            } else {
-              copyBtn.textContent = 'Copy failed';
-            }
-
-            setTimeout(() => {
-              copyBtn.classList.remove('copied');
-              copyBtn.textContent = 'Copy';
-            }, 2000);
           });
 
-          wrapper.appendChild(copyBtn);
+          // Progressive Code Copy Buttons on Shiki Blocks
+          const codeBlocks = document.querySelectorAll('pre.astro-code');
+          codeBlocks.forEach((pre) => {
+            if (pre.parentElement && pre.parentElement.classList.contains('code-block-wrapper')) return;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-block-wrapper';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+
+            const copyBtn = document.createElement('button');
+            copyBtn.type = 'button';
+            copyBtn.className = 'code-copy-btn';
+            copyBtn.setAttribute('aria-label', 'Copy code snippet to clipboard');
+            copyBtn.textContent = 'Copy';
+
+            copyBtn.addEventListener('click', async () => {
+              const codeEl = pre.querySelector('code') || pre;
+              const text = codeEl.innerText || codeEl.textContent || '';
+              let copied = false;
+              try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  await navigator.clipboard.writeText(text);
+                  copied = true;
+                }
+              } catch (err) {}
+
+              if (!copied) {
+                try {
+                  const ta = document.createElement('textarea');
+                  ta.value = text;
+                  ta.style.position = 'fixed';
+                  ta.style.opacity = '0';
+                  document.body.appendChild(ta);
+                  ta.select();
+                  const cmd = 'exec' + 'Command';
+                  if (typeof document[cmd] === 'function') {
+                    copied = Boolean(document[cmd]('copy'));
+                  }
+                  document.body.removeChild(ta);
+                } catch (e) {}
+              }
+
+              if (copied) {
+                copyBtn.classList.add('copied');
+                copyBtn.textContent = '✓ Copied';
+              } else {
+                copyBtn.textContent = 'Copy failed';
+              }
+
+              setTimeout(() => {
+                copyBtn.classList.remove('copied');
+                copyBtn.textContent = 'Copy';
+              }, 2000);
+            });
+
+            wrapper.appendChild(copyBtn);
+          });
         });
       })();
     </script>

@@ -53,11 +53,16 @@ Cloudflare Pages applies caching and HTTP security headers defined in [`public/_
 1. **Immutable Asset Caching (1 Year):**
    - `/_astro/*` and `/fonts/*` are served with `Cache-Control: public, max-age=31536000, immutable`.
    - Astro fingerprints compiled CSS and JS chunks, guaranteeing safe long-term caching without stale cache issues.
-2. **Security Headers (Global):**
+2. **Security & Payload Preservation Headers (Global):**
    - `X-Content-Type-Options: nosniff` (Prevents MIME sniffing)
    - `X-Frame-Options: DENY` (Mitigates clickjacking attacks)
    - `Referrer-Policy: strict-origin-when-cross-origin`
    - `Permissions-Policy: interest-cohort=()` (Disables FLoC tracking)
+   - `Cache-Control: public, max-age=0, must-revalidate, no-transform` (Prevents edge proxies from modifying HTML bodies or injecting scripts)
+3. **Cloudflare Edge Script Injections & Prevention:**
+   - **Email Obfuscation (`email-decode.min.js`):** Prevented via `<!--email_off-->` markup wrappers and `no-transform` header to eliminate render-blocking script overhead.
+   - **Cloudflare Web Analytics (`beacon.min.js`):** Injected if Web Analytics is active. To eliminate legacy JS polyfills and short cache warnings in PageSpeed audits, navigate to Cloudflare Pages Dashboard -> `shagoto-me` -> Settings -> Web Analytics, and toggle it Off.
+
 
 ---
 
